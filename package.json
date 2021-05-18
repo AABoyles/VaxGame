@@ -1,0 +1,19 @@
+{
+  "name": "vaxgame",
+  "version": "2.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AABoyles/VaxGame.git"
+  },
+  "author": "Tony Boyles <aaboyles@gmail.com>",
+  "license": "CC-BY-SA-3.0",
+  "bugs": {
+    "url": "https://github.com/AABoyles/VaxGame/issues"
+  },
+  "homepage": "https://github.com/AABoyles/VaxGame#readme"
+}
