@@ -1,10 +1,13 @@
 function initBasicMenu() {
   d3.select(".vaxLogoDiv")
     .style("visibility", "visible");
+
   d3.select(".vaxLogoDiv")
     .style("left", "-12px");
+  
   d3.select("body").append("div")
     .attr("class", "newGameHeader").text("NEW GAME");
+
   d3.select("body").append("div")
     .attr("class", "difficultySelection");
   d3.select(".difficultySelection").append("div")

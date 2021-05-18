@@ -623,6 +623,7 @@ function frontTick() {
       return t.target.y
     })
 }
+var rerun = false;
 function selectIndexCase() {
   var t = graph.nodes.length
     , e = 0;
