@@ -40,6 +40,39 @@ svg|a:hover, svg|a:active {
   text-decoration: none;
 }
 
+.about {
+  position: absolute;
+  right: 0px;
+  bottom: 50px;
+  position: absolute;
+  background: #85bc99;
+  font-family: "Nunito";
+  font-weight: 300;
+  font-size: 14px;
+  color: white;
+  width: 155px;
+  height: 25px;
+  padding-top: 10px;
+  padding-left: 12px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 5px 6px #838383;
+  -webkit-transition-duration: 0.5s;
+  -moz-transition-duration: 0.5s;
+  -o-transition-duration: 0.5s;
+  transition-duration: 0.5s
+}
+
+.about a {
+  color: white;
+  text-decoration: none;
+}
+
+.about a:hover {
+  color: "707070";
+  text-decoration: none;
+}
+
 .clearfix {
   *zoom: 1
 }
@@ -5698,8 +5731,8 @@ body {
   height: 45px;
   padding-top: 30px;
   padding-left: 0px;
-  top: 85%;
-  right: -300px;
+  bottom: 0%;
+  right: 0px;
   box-shadow: 5px 6px #838383;
   -webkit-transition-duration: 0.5s;
   -moz-transition-duration: 0.5s;
@@ -5858,29 +5891,6 @@ body {
   fill: #707070;
   font-weight: 500;
   font-size: 28px
-}
-
-.about {
-  position: absolute;
-  background: #85bc99;
-  font-family: "Nunito";
-  font-weight: 300;
-  font-size: 14px;
-  color: white;
-  width: 155px;
-  height: 25px;
-  margin-top: 20px;
-  padding-top: 10px;
-  padding-left: 12px;
-  text-align: center;
-  top: 100%;
-  right: -500px;
-  cursor: pointer;
-  box-shadow: 5px 6px #838383;
-  -webkit-transition-duration: 0.5s;
-  -moz-transition-duration: 0.5s;
-  -o-transition-duration: 0.5s;
-  transition-duration: 0.5s
 }
 
 .clearfix:after {
@@ -8248,17 +8258,12 @@ body .ui-tooltip {
 }
 
 .menuBox {
-  position: relative;
+  position: absolute;
   background: #85bc99;
-  float: right;
-  color: "white";
-  width: 550px;
-  height: 45px;
-  top: -75px;
-  padding-top: 30px;
-  padding-left: 12px;
+  top: 0px;
+  padding: 5px;
   text-align: center;
-  right: -1000px;
+  right: 0;
   visibility: visible;
   display: inline;
   box-shadow: 5px 7px #838383;
