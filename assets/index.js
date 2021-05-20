@@ -24,24 +24,6 @@ let frontLinks = [
   }
 ];
 
-frontForce = d3.layout.force()
-  .nodes(frontNodes)
-  .links(frontLinks)
-  .size([width, height])
-  .charge(-3e4)
-  .friction(.8)
-  .on("tick", () => {
-    frontNode
-      .attr("cx", t => t.x = Math.max(8, Math.min(width - 50, t.x)))
-      .attr("cy", t => t.y = Math.max(8, Math.min(height, t.y)));
-    frontLink
-      .attr("x1", t => t.source.x)
-      .attr("y1", t => t.source.y)
-      .attr("x2", t => t.target.x)
-      .attr("y2", t => t.target.y)
-    })
-  .start();
-
 frontLink = svg.select("g.links").selectAll(".link")
   .data(frontLinks)
   .enter()
@@ -53,46 +35,54 @@ frontLink = svg.select("g.links").selectAll(".link")
 
 frontNode = svg.select("g.nodes").selectAll(".node")
   .data(frontNodes)
-  .enter()
-  .append("circle")
-  .attr("class", "node")
-  .attr("r", 50)
-  .style("stroke", "#b7b7b7")
-  .style("stroke-width", "10px")
-  .attr("fill", t => ((3 == t.id) ? "#f1d2d2" : "#d5d5d5"))
-  .call(frontForce.drag)
+  .join("circle")
+    .attr("class", "node")
+    .attr("r", 50)
+    .style("stroke", "#b7b7b7")
+    .style("stroke-width", "10px")
+    .attr("fill", t => ((3 == t.id) ? "#f1d2d2" : "#d5d5d5"))
+    .call(d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended));
+
+function dragstarted(event) {
+  if (!event.active) simulation.alphaTarget(0.3).restart();
+  event.subject.fx = event.subject.x;
+  event.subject.fy = event.subject.y;
+}
+
+function dragged(event) {
+  event.subject.fx = event.x;
+  event.subject.fy = event.y;
+}
+
+function dragended(event) {
+  if (!event.active) simulation.alphaTarget(0);
+  event.subject.fx = null;
+  event.subject.fy = null;
+}
+
+simulation = d3.forceSimulation(frontNodes)
+  .force("charge", d3.forceManyBody().strength(-1000))
+  .force("links", d3.forceLink(frontLinks).distance(300))
+  .force("center", d3.forceCenter(width/2, height/2))
+  .on("tick", () => {
+    frontNode
+      .attr("cx", t => t.x = Math.max(8, Math.min(width - 50, t.x)))
+      .attr("cy", t => t.y = Math.max(8, Math.min(height, t.y)));
+    frontLink
+      .attr("x1", t => t.source.x)
+      .attr("y1", t => t.source.y)
+      .attr("x2", t => t.target.x)
+      .attr("y2", t => t.target.y)
+    });
 
 const resize = function(){
   width = window.innerWidth;
   height = window.innerHeight;
-
-  frontForce.size([width, height])
-
-  svg.select(".homeTitle")
-    .attr("x", width/2)
-    .attr("y", height/3)
-    .style("pointer-events", "none");
-
-  svg.select(".homeText")
-    .attr("x", width/2)
-    .attr("y", height/3 + 50)
-    .style("pointer-events", "none");
-    
-  svg.select(".homeTour")
-    .attr("x", width - 5)
-    .attr("y", height - 110);
-    
-  svg.select(".homeGame")
-    .attr("x", width - 5)
-    .attr("y", height - 75);
-    
-  svg.select(".homeHI")
-    .attr("x", width - 5)
-    .attr("y", height - 40);
-
-  svg.select(".copyright")
-    .attr("x", width - 5)
-    .attr("y", height - 10);
+  svg.attr('viewBox', `0 0 ${width} ${height}`);
+  simulation.force("center", d3.forceCenter(width/2, height/2));
 };
 
 resize();
