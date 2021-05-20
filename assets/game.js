@@ -5,14 +5,14 @@ function initCookiesOnDelay() {
 function initSocialShare() {
   if (!(0 > vaxHardHiScore)) {
     var e, t;
-    e = "https://twitter.com/intent/tweet?original_referer=http%3A%2F%2F.vax.herokuapp.com&text=I just stopped an epidemic in its tracks! Can you can beat my high scores? Easy: " + vaxEasyHiScore + "%25 %7C Medium: " + vaxMediumHiScore + "%25 %7C Hard: " + vaxHardHiScore + "%25. vax.herokuapp.com", t = "http://www.facebook.com/sharer.php?s=100&p[title]=Vax! | Gamifying Epidemic Prevention&p[summary]=I just stopped an epidemic in its tracks! Can you beat my high scores? Easy: " + vaxEasyHiScore + "% | Medium: " + vaxMediumHiScore + "% | Hard: " + vaxHardHiScore + "%.&p[url]=http://vax.herokuapp.com", d3.select(".difficultySelection").append("svg").attr("class", "socialShareMain").style("left", "300px").style("top", "300px").style("width", "300px").style("height", "200px"), d3.select(".socialShareMain").append("text").attr("x", 0).attr("y", 70).style("font-family", "Nunito").style("font-size", "25px").style("font-weight", "300").style("fill", "#707070").style("cursor", "pointer").text("Share All ▾").on("click", function() {
+    e = "https://twitter.com/intent/tweet?original_referer=http%3A%2F%2F.vax.herokuapp.com&text=I just stopped an epidemic in its tracks! Can you can beat my high scores? Easy: " + vaxEasyHiScore + "%25 %7C Medium: " + vaxMediumHiScore + "%25 %7C Hard: " + vaxHardHiScore + "%25. vax.herokuapp.com", t = "https://www.facebook.com/sharer.php?s=100&p[title]=Vax! | Gamifying Epidemic Prevention&p[summary]=I just stopped an epidemic in its tracks! Can you beat my high scores? Easy: " + vaxEasyHiScore + "% | Medium: " + vaxMediumHiScore + "% | Hard: " + vaxHardHiScore + "%.&p[url]=https://vax.herokuapp.com", d3.select(".difficultySelection").append("svg").attr("class", "socialShareMain").style("left", "300px").style("top", "300px").style("width", "300px").style("height", "200px"), d3.select(".socialShareMain").append("text").attr("x", 0).attr("y", 70).style("font-family", "Nunito").style("font-size", "25px").style("font-weight", "300").style("fill", "#707070").style("cursor", "pointer").text("Share All ▾").on("click", function() {
       d3.selectAll(".shareIcon").transition().duration(500).attr("opacity", 1)
     }), d3.select(".socialShareMain").append("image").attr("class", "shareIcon").attr("x", 25).attr("y", 100).attr("height", "50px").attr("width", "50px").attr("xlink:href", "/assets/facebook_icon.png").attr("id", "facebook").style("cursor", "pointer").attr("opacity", 0).on("click", function() {
       window.location.href = t
     }), d3.select(".socialShareMain").append("image").attr("class", "shareIcon").attr("x", 100).attr("y", 100).attr("height", "50px").attr("width", "50px").attr("xlink:href", "/assets/twitter_icon.png").attr("id", "twitter").attr("opacity", 0).style("cursor", "pointer").on("click", function() {
       window.location.href = e
     }), d3.select(".socialShareMain").append("image").attr("class", "shareIcon").attr("x", 175).attr("y", 100).attr("height", "50px").attr("width", "50px").attr("xlink:href", "/assets/googleplus_icon.png").attr("id", "twitter").attr("opacity", 0).style("cursor", "pointer").on("click", function() {
-      window.location.href = "https://plus.google.com/share?url=http://vax.herokuapp.com"
+      window.location.href = "https://plus.google.com/share?url=https://vax.herokuapp.com"
     })
   }
 }
@@ -544,13 +544,13 @@ function initScoreRecap() {
 function addShareButtons(e, t) {
   void 0 == difficultyString && (t = "Custom");
   var i = "https://twitter.com/intent/tweet?original_referer=http%3A%2F%2F.vax.herokuapp.com&text=I just stopped an epidemic in its tracks! Can you can beat " + e + "%25 on " + t + "? Fight the outbreak at&url=http%3A%2F%2Fvax.herokuapp.com",
-    a = "http://www.facebook.com/sharer.php?s=100&p[title]=Vax! | Gamifying Epidemic Prevention&p[summary]=I just stopped an epidemic in its tracks! Can you beat " + e + "% on " + t + "?&p[url]=http://vax.herokuapp.com";
+    a = "https://www.facebook.com/sharer.php?s=100&p[title]=Vax! | Gamifying Epidemic Prevention&p[summary]=I just stopped an epidemic in its tracks! Can you beat " + e + "% on " + t + "?&p[url]=https://vax.herokuapp.com";
   d3.select(".gameSVG").append("image").attr("x", 790).attr("y", 365).attr("height", "50px").attr("width", "50px").attr("xlink:href", "/assets/facebook_icon.png").attr("class", "shareIcon").attr("id", "facebook").style("padding", "12px 7px 0px 7px").style("width", "25px").style("cursor", "pointer").attr("opacity", 0).on("click", function() {
     window.location.href = a
   }), d3.select(".gameSVG").append("image").attr("x", 865).attr("y", 365).attr("height", "50px").attr("width", "50px").attr("xlink:href", "/assets/twitter_icon.png").attr("class", "shareIcon").attr("id", "twitter").style("padding", "12px 7px 0px 7px").style("width", "25px").attr("opacity", 0).style("cursor", "pointer").on("click", function() {
     window.location.href = i
   }), d3.select(".gameSVG").append("image").attr("x", 940).attr("y", 365).attr("height", "50px").attr("width", "50px").attr("xlink:href", "/assets/googleplus_icon.png").attr("class", "shareIcon").attr("id", "g+").attr("opacity", 0).style("padding", "12px 7px 0px 7px").style("width", "25px").style("cursor", "pointer").on("click", function() {
-    window.location.href = "https://plus.google.com/share?url=http://vax.herokuapp.com"
+    window.location.href = "https://plus.google.com/share?url=https://vax.herokuapp.com"
   }), d3.select(".gameSVG").append("text").attr("x", 750).attr("y", 345).style("font-family", "Nunito").style("font-size", "25px").style("font-weight", "500").style("fill", "#707070").text("Share ▾").on("click", function() {
     d3.selectAll(".shareIcon").transition().duration(500).attr("opacity", 1)
   })
@@ -587,13 +587,13 @@ function loadConclusionText() {
   var a;
   "easy" == difficultyString && (a = "Easy"), "medium" == difficultyString && (a = "Medium"), "hard" == difficultyString && (a = "Hard"), null == difficultyString && (a = "Custom", i = e);
   var o = "https://twitter.com/intent/tweet?original_referer=http%3A%2F%2F.vax.herokuapp.com&text=I just stopped an epidemic in its tracks! Can you can beat " + i + "%25 on " + a + "? Fight the outbreak at&url=http%3A%2F%2Fvax.herokuapp.com",
-    r = "http://www.facebook.com/sharer.php?s=100&p[title]=Vax! | Gamifying Epidemic Prevention&p[summary]=I just stopped an epidemic in its tracks! Can you beat " + i + "% on " + a + "?&p[url]=http://vax.herokuapp.com";
+    r = "https://www.facebook.com/sharer.php?s=100&p[title]=Vax! | Gamifying Epidemic Prevention&p[summary]=I just stopped an epidemic in its tracks! Can you beat " + i + "% on " + a + "?&p[url]=https://vax.herokuapp.com";
   d3.select(".gameSVG").append("image").attr("x", 150).attr("y", 355).attr("height", "50px").attr("width", "50px").attr("xlink:href", "/assets/facebook_icon.png").attr("id", "facebook").style("padding", "12px 7px 0px 7px").style("cursor", "pointer").on("click", function() {
     window.location.href = r
   }), d3.select(".gameSVG").append("image").attr("x", 215).attr("y", 355).attr("height", "50px").attr("width", "50px").attr("xlink:href", "/assets/twitter_icon.png").attr("id", "twitter").style("padding", "12px 7px 0px 7px").style("width", "25px").style("cursor", "pointer").on("click", function() {
     window.location.href = o
   }), d3.select(".gameSVG").append("image").attr("x", 280).attr("y", 355).attr("height", "50px").attr("width", "50px").attr("xlink:href", "/assets/googleplus_icon.png").attr("id", "twitter").style("padding", "12px 7px 0px 7px").style("width", "25px").style("cursor", "pointer").on("click", function() {
-    window.location.href = "https://plus.google.com/share?url=http://vax.herokuapp.com"
+    window.location.href = "https://plus.google.com/share?url=https://vax.herokuapp.com"
   }), null == difficultyString ? (d3.select(".gameSVG").append("text").attr("class", "recapText").attr("x", 260).attr("y", 525).text("Well done, you saved " + e + "% of the network."), d3.select(".gameSVG").append("text").attr("class", "recapButton").attr("x", 470).attr("y", 590).text("Retry").on("click", retry).on("mouseover", function() {
     d3.select(this).style("fill", "#2692F2")
   }).on("mouseout", function() {
