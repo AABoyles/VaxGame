@@ -11,13 +11,11 @@ body {
   position: relative;
   width: 100%;
   vertical-align: top;
-  overflow: hidden;
   font-family: "Nunito";
   margin: 0;
   font-size: 14px;
   line-height: 20px;
   color: #333;
-  background-color: #fff;
   height: 100%;
 }
 
@@ -225,27 +223,6 @@ svg|a:hover, svg|a:active {
   font-weight: 300;
   font-size: 18px;
   fill: #f1f1f1
-}
-
-.scenarioVaxLogoDiv {
-  position: absolute;
-  background: #85bc99;
-  font-weight: 400;
-  font-size: 28px;
-  color: #f1f1f1;
-  width: 125px;
-  height: 45px;
-  padding-top: 30px;
-  padding-left: 12px;
-  text-align: center;
-  top: 45px;
-  left: -12px;
-  cursor: pointer;
-  box-shadow: 5px 6px #838383;
-  -webkit-transition-duration: 0.5s;
-  -moz-transition-duration: 0.5s;
-  -o-transition-duration: 0.5s;
-  transition-duration: 0.5s
 }
 
 .verifyUnlockBox {
@@ -751,13 +728,6 @@ svg {
   padding: 0 calc(3rem + 84px);
 }
 
-.popup_game_share {
-  position: absolute;
-  top: 330px;
-  left: 270px;
-  visibility: hidden
-}
-
 #pinNodesDiv {
   position: absolute;
   top: 5px;
@@ -835,15 +805,6 @@ svg {
   color: #707070
 }
 
-.difficultySelection {
-  position: absolute;
-  left: 100px;
-  top: 125px;
-  height: 600px;
-  width: 700px;
-  vertical-align: middle
-}
-
 .difficultyItem {
   position: relative;
   font-size: 32px;
@@ -864,8 +825,7 @@ svg {
   cursor: pointer
 }
 
-.difficultyHeader {
-  position: relative;
+#difficulty-header, #options-header {
   font-size: 22px;
   font-weight: 700;
   color: #707070;
@@ -955,6 +915,14 @@ svg {
   font-size: 28px
 }
 
+#accordionExample{
+  box-shadow: 5px 6px #838383;
+}
+
+.accordion-item{
+  border-right: none;
+}
+
 .accordion-button{
   background-color: #85bc99;
   color: #ffffff;
@@ -967,4 +935,43 @@ svg {
 
 .accordion-button:hover{
   background-color: #2692f2;
+}
+
+.accordion-item:first-of-type {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.accordion-item:first-of-type .accordion-button {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.accordion-item:last-of-type {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.accordion-item:last-of-type .accordion-collapse {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.accordion-item:last-of-type .accordion-button.collapsed {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+#settings-wrapper {
+  padding: 0 calc(3rem + 84px);
+}
+
+.prior-score {
+  color: #BABABA;
+}
+.difficulty-launch {
+  cursor: pointer;
+}
+.difficulty-launch:hover {
+  color: rgb(38, 146, 242);
 }

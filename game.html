@@ -9,37 +9,59 @@
 </head>
 
 <body>
+  <svg style="z-index:-1;"></svg>
   
   <div id="vax-logo" style="cursor: pointer">
     <h1><a href="../" style="text-decoration: none; color: white;">VAX!</a></h1>
   </div>
 
-  <div>
-    <div class="actionVax" onclick="activateGameVaccinationMode()">
-      <div class="vaccineDepressedState"></div>
-      <text id="vaxShieldText"> VACCINES </text>
-      <img id="vaxShieldIcon" src="assets/vaxShield.svg" onclick="activateGameVaccinationMode()">
+  <div id="settings-wrapper" class="container-fluid">
+    <h1 class="py-5">New Game</h1>
+    <div class="row">
+      <div class="col">
+        <div id="difficulty-selection">
+          <div id="difficulty-header">
+            Difficulty
+          </div>
+          <div class="difficulty-launch" id="difficulty-easy">Easy <span class="prior-score" id="score-easy"></span></div>
+          <div class="difficulty-launch" id="difficulty-medium">Medium <span class="prior-score" id="score-medium"></span></div>
+          <div class="difficulty-launch" id="difficulty-hard">Hard <span class="prior-score" id="score-hard"></span></div>
+          <div class="difficulty-launch" id="difficulty-custom">Custom</div>
+        </div>    
+      </div>
+      <div class="col">
+        <div id="options-header">
+          Options
+        </div>
+        
+      </div>
     </div>
+  </div>
 
-    <div class="actionQuarantine" onclick="activateGameQuarantineMode()">
-      <div class="quarantineDepressedState"></div>
-      <text id="quarantineText"> QUARANTINE </text>
-      <img id="quarantineIcon" src="assets/quarantine.svg" onclick="activateGameQuarantineMode()">
-    </div>
+  <div class="actionVax" onclick="activateGameVaccinationMode()">
+    <div class="vaccineDepressedState"></div>
+    <text id="vaxShieldText"> VACCINES </text>
+    <img id="vaxShieldIcon" src="assets/vaxShield.svg" onclick="activateGameVaccinationMode()">
+  </div>
 
-    <div id="customMenuDiv">
-      <div class="customHeaderFooter" id="customLevelHeader"> CUSTOM LEVEL </div>
-      <div class="customMenuItem" id="customNodes"> Nodes: </div>
-      <div id="nodeSlider"></div>
-      <div class="customMenuItem" id="customDegree"> Neighbors: </div>
-      <div id="degreeSlider"></div>
-      <div class="customMenuItem" id="customVaccines"> Vaccines:  </div>
-      <div id="vaccineSlider"></div>
-      <div class="customMenuItem" id="customRefusers"> Refusers:  </div>
-      <div id="refuserSlider"></div>
-      <div class="customMenuItem" id="customOutbreaks"> Outbreaks:  </div>
-      <div id="outbreakSlider"></div>
-    </div>
+  <div class="actionQuarantine" onclick="activateGameQuarantineMode()">
+    <div class="quarantineDepressedState"></div>
+    <text id="quarantineText"> QUARANTINE </text>
+    <img id="quarantineIcon" src="assets/quarantine.svg" onclick="activateGameQuarantineMode()">
+  </div>
+
+  <div id="customMenuDiv">
+    <div class="customHeaderFooter" id="customLevelHeader"> CUSTOM LEVEL </div>
+    <div class="customMenuItem" id="customNodes"> Nodes: </div>
+    <div id="nodeSlider"></div>
+    <div class="customMenuItem" id="customDegree"> Neighbors: </div>
+    <div id="degreeSlider"></div>
+    <div class="customMenuItem" id="customVaccines"> Vaccines:  </div>
+    <div id="vaccineSlider"></div>
+    <div class="customMenuItem" id="customRefusers"> Refusers:  </div>
+    <div id="refuserSlider"></div>
+    <div class="customMenuItem" id="customOutbreaks"> Outbreaks:  </div>
+    <div id="outbreakSlider"></div>
   </div>
  
   <audio id="audio"><source src="assets/pop.wav" type="audio/wav"></audio>
@@ -47,7 +69,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js" integrity="sha512-oJp0DdQuQQrRsKVly+Ww6fAN1GwJN7d1bi8UubpEbzDUh84WrJ2CFPBnT4LqBCcfqTcHR5OGXFFhaPe3g1/bzQ==" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA==" crossorigin="anonymous"></script>
-  <script src="assets/game-menu.js" type="text/javascript"></script>
   <script src="assets/common.js" type="text/javascript"></script>
   <script src="assets/game.js" type="text/javascript"></script>
 
