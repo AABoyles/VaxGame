@@ -538,7 +538,8 @@ svg|a:hover, svg|a:active {
 .node {
   stroke: #636363;
   stroke-width: 2px;
-  pointer-events: all
+  pointer-events: all;
+  fill: #b7b7b7;
 }
 
 .link {
@@ -806,30 +807,26 @@ svg {
 }
 
 .difficultyItem {
-  position: relative;
-  font-size: 32px;
-  display: block;
-  font-weight: 300;
   color: #707070;
-  margin-top: 30px;
-  cursor: pointer
 }
 
 .difficultyItemGrey {
-  position: relative;
-  font-size: 32px;
-  display: block;
-  font-weight: 300;
   color: #BABABA;
-  margin-top: 30px;
-  cursor: pointer
 }
 
 #difficulty-header, #options-header {
-  font-size: 22px;
-  font-weight: 700;
   color: #707070;
   padding-top: 30px
+}
+
+#custom-modal .modal-content {
+  border-radius: 0;
+}
+
+#custom-modal .modal-header {
+  background: #85bc99;
+  color: #ffffff;
+  border-radius: 0;
 }
 
 #customMenuDiv {

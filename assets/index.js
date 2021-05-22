@@ -1,4 +1,4 @@
-let svg = d3.selectAll("svg"),
+let svg = d3.select("svg"),
     width = window.innerWidth;
     height = window.innerHeight;
 
@@ -28,7 +28,6 @@ frontLink = svg.select("g.links").selectAll(".link")
   .data(frontLinks)
   .enter()
   .append("line")
-  .attr("class", "link")
   .style("fill", "#707070")
   .style("stroke-width", "10px")
   .style("stroke", "#d5d5d5");
@@ -36,7 +35,6 @@ frontLink = svg.select("g.links").selectAll(".link")
 frontNode = svg.select("g.nodes").selectAll(".node")
   .data(frontNodes)
   .join("circle")
-    .attr("class", "node")
     .attr("r", 50)
     .style("stroke", "#b7b7b7")
     .style("stroke-width", "10px")
