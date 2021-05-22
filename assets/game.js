@@ -1,122 +1,142 @@
-function initCustomMenu() {
-  d3.selectAll(".difficultyItem").remove();
-  d3.selectAll(".difficultyItemHighlight").remove();
-  d3.selectAll(".difficultyItemGrey").remove();
-  d3.selectAll(".difficultyCustom").remove();
-  d3.selectAll(".difficultyHeader").remove();
-  d3.select("#customMenuDiv").style("visibility", "visible");
-  d3.select("#customNodes").text("Nodes: " + parseInt($.cookie("customNodes")));
-  d3.select("#customDegree").text("Neighbors: " + parseInt($.cookie("customNeighbors")) + "ea.");
-  d3.select("#customVaccines").text("Vaccines: " + parseInt($.cookie("customVaccines")));
-  d3.select("#customRefusers").text("Refusers: " + parseInt($.cookie("customRefusers")));
-  d3.select("#customOutbreaks").text("Outbreaks: " + parseInt($.cookie("customOutbreaks")));
-  d3.selectAll(".ui-state-default").style("background", "white");
-  d3.selectAll(".ui-corner-all").style("border-radius", "50px");
-  d3.select("#customMenuDiv")
-    .append("text")
-    .attr("class", "okayButton")
-    .text("OKAY")
-    .on("click", function() {
-      d3.select(this).remove();
-      d3.select(".vaxLogoDiv").remove();
-      initCustomGame();
-    });
-}
+var numberOfIndividuals,
+  meanDegree,
+  rewire = .1,
+  graph = {},
+  force,
+  node,
+  link,
+  scenarioTitle,
+  resizingParameter = 2,
+  invisibleParameter = 1.9,
+  transmissionRate,
+  recoveryRate,
+  transmissionRates = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1],
+  recoveryRates = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1],
+  independentOutbreaks = 1,
+  numberVaccinated,
+  numberQuarantined,
+  numberSaved,
+  numberInfected,
+  numberOfRefusers,
+  gameSVG,
+  width = window.innerWidth,
+  height = window.innerHeight,
+  charge = -900,
+  friction = .9,
+  numberOfVaccines = 0,
+  vaccineSupply = 0,
+  difficultyString,
+  customNodeChoice,
+  customNeighborChoice,
+  customVaccineChoice,
+  customOutbreakChoice,
+  customRefuserChoice,
+  timestep = 0,
+  newInfections = [],
+  exposureEdges = [],
+  xyCoords = [],
+  diseaseIsSpreading = !1,
+  timeToStop = !1,
+  infectedBar,
+  uninfectedBar,
+  infectedHeight,
+  uninfectedHeight,
+  game,
+  easyBar = 70,
+  mediumBar = 50,
+  hardBar = 40,
+  vaxEasyCompletion,
+  vaxMediumCompletion,
+  vaxHardCompletion,
+  vaxEasyHiScore,
+  vaxMediumHiScore,
+  vaxHardHiScore,
+  vaxEasyHiScoreRT,
+  vaxMediumHiScoreRT,
+  vaxHardHiScoreRT,
+  easyScores,
+  mediumScores,
+  hardScores,
+  scores = {
+    easy: easyScores,
+    medium: mediumScores,
+    hard: hardScores
+  },
+  easyScoresRT,
+  mediumScoresRT,
+  hardScoresRT,
+  scoresRT = {
+    easy: easyScoresRT,
+    medium: mediumScoresRT,
+    hard: hardScoresRT
+  },
+  currentNode,
+  currentElement,
+  cookie = {},
+  pop,
+  best,
+  current,
+  originalLocation = [0, 0],
+  newLocation = [0, 0],
+  dragStartDateObject,
+  dragStartMillis,
+  dragEndDateObject,
+  dragEndMillis,
+  clickTime,
+  dragDistanceThreshold = 10,
+  clickTimeThreshold = 100,
+  customNodeChoice = 1,
+  customVaccineChoice = 1,
+  customNeighborChocie = 1,
+  customOutbreakChoice = 1;
+var speed = !1,
+  toggleDegree = !0;
 
 function initCookiesJSON() {
-  var e = $.cookie("vaxEasyCompletion");
+  var e = Cookies.get("vaxEasyCompletion");
   e || isNaN(customNodeChoice) ? clearCookies() : (
     !e || isNaN(customNodeChoice)) && clearCookies(),
-  $.cookie("customNodes", 75);
-  $.cookie("customNeighbors", 3);
-  $.cookie("customVaccines", 10);
-  $.cookie("customOutbreaks", 2);
-  $.cookie("customRefusers", .05);
-  $.cookie.json = !0;
+  Cookies.set("customNodes",  75);
+  Cookies.set("customNeighbors",  3);
+  Cookies.set("customVaccines",  10);
+  Cookies.set("customOutbreaks",  2);
+  Cookies.set("customRefusers",  .05);
+  Cookies.set("json", !0);
   easyScores = [];
   mediumScores = [];
   hardScores = [];
   var t = [easyScores, mediumScores, hardScores];
-  easyScoresRT = [], mediumScoresRT = [], hardScoresRT = [];
+  easyScoresRT = [],
+  mediumScoresRT = [],
+  hardScoresRT = [];
   var o = [easyScoresRT, mediumScoresRT, hardScoresRT],
-    s = {
-      easy: !1,
-      medium: !1,
-      hard: !1,
-      scores: t,
-      scoresRT: o
-    };
-  $.cookie("vaxCookie", JSON.stringify(s), {
+      s = {
+        easy: !1,
+        medium: !1,
+        hard: !1,
+        scores: t,
+        scoresRT: o
+      };
+  Cookies.set("vaxCookie", s, {
     expires: 365,
     path: "/"
   })
 }
-customNodeChoice = 1, customVaccineChoice = 1, customNeighborChocie = 1, customOutbreakChoice = 1;
-var speed = !1,
-  toggleDegree = !0,
-  maxVax = parseInt($.cookie("customNodes"));
-$(function() {
-  $("#nodeSlider").slider({
-    range: "min",
-    min: 10,
-    max: 500,
-    value: customNodeChoice,
-    slide: function(e, t) {
-      $.cookie.json = !1, $.cookie("customNodes", t.value), $.cookie.json = !0, $("#customNodes").text("Nodes: " + t.value), customNodeChoice = t.value, customVaccineChoice = Math.round(.1 * customNodeChoice), d3.select("#customVaccines").text("Vaccines: " + Math.round(.1 * customNodeChoice)), $("#vaccineSlider").slider({
-        max: customNodeChoice,
-        value: Math.round(.1 * customNodeChoice)
-      }), customRefuserChoice = Math.round(.05 * customNodeChoice), d3.select("#customRefusers").text("Refusers: " + Math.round(.05 * customNodeChoice)), $("#refuserSlider").slider({
-        max: customNodeChoice,
-        value: Math.round(.05 * customNodeChoice)
-      })
-    }
-  }), $("#nodeSlider").slider("value", parseInt($.cookie("customNodes")))
-}), $(function() {
-  $("#degreeSlider").slider({
-    range: "min",
-    min: 1,
-    max: 8,
-    value: customNeighborChoice,
-    slide: function(e, t) {
-      $.cookie.json = !1, $.cookie("customNeighbors", t.value), $.cookie.json = !0, $("#customDegree").text("Neighbors: " + t.value + "ea."), customNeighborChoice = t.value
-    }
-  }), $("#degreeSlider").slider("value", parseInt($.cookie("customNeighbors")))
-}), $(function() {
-  $("#vaccineSlider").slider({
-    range: "min",
-    min: 1,
-    max: maxVax,
-    value: customVaccineChoice,
-    slide: function(e, t) {
-      $.cookie.json = !1, $.cookie("customVaccines", t.value), $.cookie.json = !0, $("#customVaccines").text("Vaccines: " + t.value), customVaccineChoice = t.value
-    }
-  }), $("#vaccineSlider").slider("value", parseInt($.cookie("customVaccines")))
-}), $(function() {
-  $("#outbreakSlider").slider({
-    range: "min",
-    min: 1,
-    max: 5,
-    value: customOutbreakChoice,
-    slide: function(e, t) {
-      $.cookie.json = !1, $.cookie("customOutbreaks", t.value), $.cookie.json = !0, $("#customOutbreaks").text("Outbreaks: " + t.value), customOutbreakChoice = t.value
-    }
-  }), $("#outbreakSlider").slider("value", parseInt($.cookie("customOutbreaks")))
-}), $(function() {
-  $("#refuserSlider").slider({
-    range: "min",
-    min: 0,
-    max: maxVax,
-    value: customRefuserChoice,
-    slide: function(e, t) {
-      $.cookie.json = !1, $.cookie("customRefusers", t.value), $.cookie.json = !0, $("#customRefusers").text("Refusers: " + t.value), customRefuserChoice = t.value
-    }
-  }), $("#refuserSlider").slider("value", parseInt($.cookie("customRefusers")))
-});
 
 function readCookiesJSON() {
-  $.cookie.json = !0;
-  var e = $.cookie("vaxCookie");
-  if (void 0 == e && initCookiesJSON(), cookie = $.cookie("vaxCookie"), vaxEasyCompletion = cookie.easy, vaxMediumCompletion = cookie.medium, vaxHardCompletion = cookie.hard, vaxEasyHiScore = Math.max.apply(Math, cookie.scores[0]), vaxMediumHiScore = Math.max.apply(Math, cookie.scores[1]), vaxHardHiScore = Math.max.apply(Math, cookie.scores[2]), void 0 == cookie.scoresRT) {
+  Cookies.set("json", !0);
+  var e = Cookies.getJSON("vaxCookie");
+  if (
+    void 0 == e && initCookiesJSON(),
+    cookie = Cookies.getJSON("vaxCookie"),
+    vaxEasyCompletion = cookie.easy,
+    vaxMediumCompletion = cookie.medium,
+    vaxHardCompletion = cookie.hard,
+    vaxEasyHiScore = Math.max.apply(Math, cookie.scores[0]),
+    vaxMediumHiScore = Math.max.apply(Math, cookie.scores[1]),
+    vaxHardHiScore = Math.max.apply(Math, cookie.scores[2]),
+    void 0 == cookie.scoresRT
+  ) {
     var t = [],
       i = [],
       a = [],
@@ -126,38 +146,38 @@ function readCookiesJSON() {
   vaxEasyHiScoreRT = Math.max.apply(Math, cookie.scoresRT[0]),
   vaxMediumHiScoreRT = Math.max.apply(Math, cookie.scoresRT[1]),
   vaxHardHiScoreRT = Math.max.apply(Math, cookie.scoresRT[2]),
-  $.cookie.json = !1,
-  customNodeChoice = parseInt($.cookie().customNodes), 
-  customNeighborChoice = parseInt($.cookie().customNeighbors),
-  customVaccineChoice = parseInt($.cookie().customVaccines),
-  customOutbreakChoice = parseInt($.cookie().customOutbreaks),
-  customRefuserChoice = parseInt($.cookie().customRefusers),
-  isNaN(customNodeChoice) && (customNodeChoice = 75, $.cookie("customNodes", 75)),
-  isNaN(customNeighborChoice) && (customNeighborChoice = 3, $.cookie("customNeighbors", 3)),
-  isNaN(customVaccineChoice) && (customVaccineChoice = 10, $.cookie("customVaccines", 10)),
-  isNaN(customOutbreakChoice) && (customOutbreakChoice = 2, $.cookie("customOutbreaks", 2)),
-  isNaN(customRefuserChoice) && (customRefuserChoice = .05, $.cookie("customRefusers", .05)),
-  $.cookie.json = !0,
+  Cookies.set("json", !1),
+  customNodeChoice = parseInt(Cookies.get("customNodes")), 
+  customNeighborChoice = parseInt(Cookies.get("customNeighbors")),
+  customVaccineChoice = parseInt(Cookies.get("customVaccines")),
+  customOutbreakChoice = parseInt(Cookies.get("customOutbreaks")),
+  customRefuserChoice = parseInt(Cookies.get("customRefusers")),
+  isNaN(customNodeChoice) && (customNodeChoice = 75, Cookies.set("customNodes",  75)),
+  isNaN(customNeighborChoice) && (customNeighborChoice = 3, Cookies.set("customNeighbors",  3)),
+  isNaN(customVaccineChoice) && (customVaccineChoice = 10, Cookies.set("customVaccines",  10)),
+  isNaN(customOutbreakChoice) && (customOutbreakChoice = 2, Cookies.set("customOutbreaks",  2)),
+  isNaN(customRefuserChoice) && (customRefuserChoice = .05, Cookies.set("customRefusers",  .05)),
+  Cookies.set("json", !0),
   cookieBasedModeSelection()
 }
 
 function clearCookies() {
-  $.removeCookie("vaxCookie"),
-  $.removeCookie("customNodes"),
-  $.removeCookie("customNeighbors"),
-  $.removeCookie("customVaccines"),
-  $.removeCookie("customOutbreaks"),
-  $.removeCookie("customRefusers"),
-  $.removeCookie("vaxEasyCompletion"),
-  $.removeCookie("vaxMediumCompletion"),
-  $.removeCookie("vaxHardCompletion"),
-  $.removeCookie("vaxEasyHiScore"),
-  $.removeCookie("vaxMediumHiScore"),
-  $.removeCookie("vaxHardHiScore");
+  Cookies.remove("vaxCookie"),
+  Cookies.remove("customNodes"),
+  Cookies.remove("customNeighbors"),
+  Cookies.remove("customVaccines"),
+  Cookies.remove("customOutbreaks"),
+  Cookies.remove("customRefusers"),
+  Cookies.remove("vaxEasyCompletion"),
+  Cookies.remove("vaxMediumCompletion"),
+  Cookies.remove("vaxHardCompletion"),
+  Cookies.remove("vaxEasyHiScore"),
+  Cookies.remove("vaxMediumHiScore"),
+  Cookies.remove("vaxHardHiScore");
 }
 
 function allAccess() {
-  $.cookie.json = !0,
+  Cookies.set("json", !0),
   easyScores = ["99"],
   mediumScores = ["99"],
   hardScores = ["99"];
@@ -173,64 +193,35 @@ function allAccess() {
       scores: e,
       scoresRT: t
     };
-  $.removeCookie("vaxCookie"),
-  $.cookie("vaxCookie", JSON.stringify(i), {
+  Cookies.remove("vaxCookie"),
+  Cookies.set("vaxCookie", i, {
     expires: 365,
     path: "/"
   });
 }
 
 function cookieBasedModeSelection() {
-  vaxEasyHiScore == -1 / 0 || (speed ? d3.select("#score-easy").text("(Best: " + vaxEasyHiScoreRT + "%)") :
-    d3.select("#score-easy").text("(Best: " + vaxEasyHiScore + "%)")),
-  vaxMediumHiScore == -1 / 0 || (speed ? d3.select("#score-medium").text("(Best: " + vaxMediumHiScoreRT + "%)") :
-    d3.select("#score-medium").text("(Best: " + vaxMediumHiScore + "%)")),
-  vaxHardHiScore == -1 / 0 || (speed ? d3.select("#score-hard").text("(Best: " + vaxHardHiScoreRT + "%)") :
-    d3.select("#score-hard").text("(Best: " + vaxHardHiScore + "%)")),
-  d3.select("#difficultyEasy")
-    .on("mouseover", function() {
-      d3.select(this).style("color", "#2692F2")
-    })
-    .on("mouseout", function() {
-      d3.select(this).style("color", "#707070")
-    }),
-  1 == vaxEasyCompletion ? d3.select("#difficultyMedium").attr("class", "difficultyItem")
-    .on("mouseover", function() {
-      d3.select(this).style("color", "#2692F2")
-    })
-    .on("mouseout", function() {
-      d3.select(this).style("color", "#707070")
-    })
+  vaxEasyHiScore   == -1 / 0 || d3.select("#score-easy")  .text("(Best: " + (speed ? vaxEasyHiScoreRT   : vaxEasyHiScore)   + "%)");
+  vaxMediumHiScore == -1 / 0 || d3.select("#score-medium").text("(Best: " + (speed ? vaxMediumHiScoreRT : vaxMediumHiScore) + "%)");
+  vaxHardHiScore   == -1 / 0 || d3.select("#score-hard")  .text("(Best: " + (speed ? vaxHardHiScoreRT   : vaxHardHiScore)   + "%)");
+  d3.select("#difficulty-medium")
+    .classed('difficultyItem', vaxEasyCompletion)
+    .classed('difficultyItemGrey', !vaxEasyCompletion)
     .on("click", function() {
-      difficultyString = "medium",
-      initBasicGame(difficultyString)
-    }) : d3.select("#difficultyMedium").attr("class", "difficultyItemGrey")
-    .on("mouseover", function() {})
-    .on("mouseout", function() {})
-    .on("click", function() {}),
-  1 == vaxMediumCompletion ? d3.select("#difficultyHard").attr("class", "difficultyItem")
-    .on("mouseover", function() {
-      d3.select(this).style("color", "#2692F2")
-    }).on("mouseout", function() {
-      d3.select(this).style("color", "#707070")
-    }).on("click", function() {
-      difficultyString = "hard", initBasicGame(difficultyString)
-    }) : d3.select("#difficultyHard").attr("class", "difficultyItemGrey")
-    .on("mouseover", function() {})
-    .on("mouseout", function() {})
-    .on("click", function() {}),
-  1 == vaxHardCompletion ? d3.select("#difficultyCustom").attr("class", "difficultyItem")
-    .on("mouseover", function() {
-      d3.select(this).style("color", "#2692F2")
-    }).on("mouseout", function() {
-      d3.select(this).style("color", "#707070")
-    }).on("click", function() {
-      d3.select(".difficultySelection").remove()
-      initCustomMenu()
-    }) : d3.select("#difficultyCustom").attr("class", "difficultyItemGrey")
-    .on("mouseover", function() {})
-    .on("mouseout", function() {})
-    .on("click", function() {});
+      if(1 == vaxEasyCompletion){
+        difficultyString = "medium";
+        initBasicGame(difficultyString);
+      }
+    });
+  d3.select("#difficulty-hard")
+    .classed("difficultyItem", vaxMediumCompletion)
+    .classed("difficultyItemGrey", !vaxMediumCompletion)
+    .on("click", function() {
+      if(vaxMediumCompletion){
+        difficultyString = "hard";
+        initBasicGame(difficultyString);  
+      }
+    });
 }
 
 function initFooter() {
@@ -250,7 +241,8 @@ function initFooter() {
     .on("click", () => window.location.href = "/faq.html")
     .on("mouseover", function() {
       d3.select(this).style("color", "#2692F2")
-    }).on("mouseout", function() {
+    })
+    .on("mouseout", function() {
       d3.select(this).style("color", "white")
     });
 
@@ -262,7 +254,8 @@ function initFooter() {
     .on("click", () => window.location.href = "/game.html")
     .on("mouseover", function() {
       d3.select(this).style("color", "#2692F2")
-    }).on("mouseout", function() {
+    })
+    .on("mouseout", function() {
       d3.select(this).style("color", "white")
     });
 }
@@ -303,8 +296,11 @@ function initBasicGame(e) {
   for (var t = 0; t < graph.nodes.length; t++) graph.nodes[t].fixed = !1;
   if ("hard" == e)
     for (var t = 0; t < graph.nodes.length; t++) Math.random() < .05 && (graph.nodes[t].refuser = !0);
-  removeDuplicateEdges(graph), initGameSpace()
+  removeDuplicateEdges(graph);
+  initGameSpace();
 }
+
+d3.select("#custom-launch").on('click', initCustomGame);
 
 function initCustomGame() {
   scenarioTitle = "custom",
@@ -357,18 +353,14 @@ function initGameSpace() {
     t = !1 || document.documentMode;
   gameSVG = e || t ?
     d3.select("body").append("svg")
-      .attr({
-        width: 950,
-        height: 723
-      })
+      .attr("width", 950)
+      .attr("height", 723)
       .attr("class", "gameSVG")
       .attr("pointer-events", "all")
       .append("svg:g") :
     d3.select("body").append("svg")
-      .attr({
-        width: "75%",
-        height: "80.5%"
-      })
+      .attr("width", "75%")
+      .attr("height", "80.5%")
       .attr("viewBox", "0 0 " + width + " " + height)
       .attr("class", "gameSVG")
       .attr("pointer-events", "all")
@@ -444,23 +436,61 @@ function initGameSpace() {
         .attr("fill", nodeColor)
         .on("click", function(e) {
           speed ? speedModeGameClick(e) : gameClick(e)
-        }).on("mouseover", function(e) {
-          d3.select(this).style("stroke-width", "3px"), currentNode = e, currentElement = d3.select(this)
-        }).on("mouseout", function() {
-          d3.select(this).style("stroke-width", "2px"), 1 == currentNode.fixed && d3.select(this).style("stroke-width", "3px"), currentNode = null, currentElement = null
-        }).call(d3.behavior.drag().on("dragstart", function(e) {
-          dragStartDateObject = {}, dragStartMillis = 0, dragEndMillis = 0, clickTime = 1e4, dragStartDateObject = new Date, dragStartMillis = dragStartDateObject.getMilliseconds(), originalLocation = [], newLocation = [], originalLocation[0] = e.x, originalLocation[1] = e.y, e.fixed = !0
-        }).on("drag", function(e) {
-          e.px += d3.event.dx, e.py += d3.event.dy, e.x += d3.event.dx, e.y += d3.event.dy, tick(), newLocation[0] = e.x, newLocation[1] = e.y
-        }).on("dragend", function(e) {
-          dragEndDateObject = new Date, dragEndMillis = dragEndDateObject.getMilliseconds(), clickTime = Math.abs(dragEndMillis - dragStartMillis), console.log(clickTime + "	" + getCartesianDistance(originalLocation, newLocation)), e.fixed = !1, tick(), force.resume(), getCartesianDistance(originalLocation, newLocation) < dragDistanceThreshold ? clickTimeThreshold > clickTime && (speed ? speedModeGameClick(e) : gameClick(e)) : clickTimeThreshold > clickTime && (speed ? speedModeGameClick(e) : gameClick(e))
-        })),
-      loadHotKeyText(),
-      "hard" == difficultyString && refusersPresent(),
-      (null == difficultyString || numberOfRefusers > 0) && refusersPresent(),
-      toggleDegree && "easy" == difficultyString && (charge = -850),
-      toggleDegree && "medium" == difficultyString && (charge = -450),
-      toggleDegree && "hard" == difficultyString && (charge = -300)
+        })
+        .on("mouseover", function(e) {
+          d3.select(this).style("stroke-width", "3px"),
+          currentNode = e,
+          currentElement = d3.select(this)
+        })
+        .on("mouseout", function() {
+          d3.select(this).style("stroke-width", "2px"),
+          1 == currentNode.fixed && d3.select(this).style("stroke-width", "3px"),
+          currentNode = null,
+          currentElement = null
+        })
+        .call(d3.behavior.drag()
+          .on("dragstart", function(e) {
+            dragStartDateObject = {},
+            dragStartMillis = 0,
+            dragEndMillis = 0,
+            clickTime = 1e4,
+            dragStartDateObject = new Date,
+            dragStartMillis = dragStartDateObject.getMilliseconds(),
+            originalLocation = [],
+            newLocation = [],
+            originalLocation[0] = e.x,
+            originalLocation[1] = e.y,
+            e.fixed = !0
+          })
+          .on("drag", function(e) {
+            e.px += d3.event.dx,
+            e.py += d3.event.dy,
+            e.x += d3.event.dx,
+            e.y += d3.event.dy,
+            tick(),
+            newLocation[0] = e.x,
+            newLocation[1] = e.y
+          })
+          .on("dragend", function(e) {
+            dragEndDateObject = new Date,
+            dragEndMillis = dragEndDateObject.getMilliseconds(),
+            clickTime = Math.abs(dragEndMillis - dragStartMillis),
+            console.log(clickTime + "	" + getCartesianDistance(originalLocation, newLocation)),
+            e.fixed = !1,
+            tick(),
+            force.resume(),
+            getCartesianDistance(originalLocation, newLocation) < dragDistanceThreshold ? clickTimeThreshold > clickTime && (speed ? speedModeGameClick(e) : gameClick(e)) : clickTimeThreshold > clickTime && (speed ? speedModeGameClick(e) : gameClick(e))
+          })
+        ),
+      loadHotKeyText();
+      if(difficultyString == "hard" || difficultyString == null){
+        refusersPresent();
+      }
+      if(toggleDegree){
+        charge = (difficultyString == "easy"  ) ? -850 : charge;
+        charge = (difficultyString == "medium") ? -450 : charge;
+        charge = (difficultyString == "hard"  ) ? -300 : charge;
+      }
 }
 
 function loadHotKeyText() {
@@ -755,12 +785,93 @@ function addPeriod2() {
 
 function setCookies() {
   var e = Math.round(100 * ((countSavedGAME() + numberQuarantined + numberVaccinated) / numberOfIndividuals)).toFixed(0);
-  "easy" == difficultyString && (speed ? ($.cookie("vaxEasyHiScoreRT") < e && $.cookie("vaxEasyHiScoreRT", e), e >= easyBar && $.cookie("vaxEasyCompletion", "true")) : ($.cookie("vaxEasyHiScore") < e && $.cookie("vaxEasyHiScore", e), e >= easyBar && $.cookie("vaxEasyCompletion", "true"))), "medium" == difficultyString && (speed ? ($.cookie("vaxMediumHiScoreRT") < e && $.cookie("vaxMediumHiScoreRT", e), e >= mediumBar && $.cookie("vaxMediumCompletion", "true")) : ($.cookie("vaxMediumHiScore") < e && $.cookie("vaxMediumHiScore", e), e >= mediumBar && $.cookie("vaxMediumCompletion", "true"))), "hard" == difficultyString && (speed ? ($.cookie("vaxHardHiScoreRT") < e && $.cookie("vaxHardHiScoreRT", e), e >= hardBar && $.cookie("vaxHardCompletion", "true")) : ($.cookie("vaxHardHiScore") < e && $.cookie("vaxHardHiScore", e), e >= hardBar && $.cookie("vaxHardCompletion", "true")))
+  "easy" == difficultyString && (
+    speed ? (
+      Cookies.get("vaxEasyHiScoreRT") < e &&
+      Cookies.set("vaxEasyHiScoreRT", e),
+      e >= easyBar &&
+      Cookies.set("vaxEasyCompletion",  "true")
+    ) : (
+      Cookies.get("vaxEasyHiScore") < e &&
+      Cookies.set("vaxEasyHiScore", e),
+      e >= easyBar && 
+      Cookies.set("vaxEasyCompletion",  "true")
+    )
+  ),
+  "medium" == difficultyString && (
+    speed ? (
+      Cookies.get("vaxMediumHiScoreRT") < e &&
+      Cookies.set("vaxMediumHiScoreRT", e),
+      e >= mediumBar && 
+      Cookies.set("vaxMediumCompletion",  "true")
+    ) : (
+      Cookies.get("vaxMediumHiScore") < e &&
+      Cookies.set("vaxMediumHiScore", e),
+      e >= mediumBar &&
+      Cookies.set("vaxMediumCompletion",  "true")
+    )
+  ),
+  "hard" == difficultyString && (
+    speed ? (
+      Cookies.get("vaxHardHiScoreRT") < e &&
+      Cookies.set("vaxHardHiScoreRT", e),
+      e >= hardBar &&
+      Cookies.set("vaxHardCompletion",  "true")
+    ) : (
+      Cookies.get("vaxHardHiScore") < e &&
+      Cookies.set("vaxHardHiScore", e),
+      e >= hardBar &&
+      Cookies.set("vaxHardCompletion",  "true")
+    )
+  )
 }
 
 function writeCookiesJSON() {
   var e = Math.round(100 * ((countSavedGAME() + numberQuarantined + numberVaccinated) / numberOfIndividuals)).toFixed(0);
-  "easy" == difficultyString && (speed ? (cookie.scoresRT[0].push(e), e > easyBar && (vaxEasyCompletion = !0), vaxEasyHiScoreRT = Math.max.apply(Math, cookie.scoresRT[0])) : (cookie.scores[0].push(e), e > easyBar && (vaxEasyCompletion = !0), vaxEasyHiScore = Math.max.apply(Math, cookie.scores[0]))), "medium" == difficultyString && (speed ? (cookie.scoresRT[1].push(e), e > mediumBar && (vaxMediumCompletion = !0), vaxMediumHiScoreRT = Math.max.apply(Math, cookie.scoresRT[1])) : (cookie.scores[1].push(e), e > mediumBar && (vaxMediumCompletion = !0), vaxMediumHiScore = Math.max.apply(Math, cookie.scores[1]))), "hard" == difficultyString && (speed ? (cookie.scoresRT[2].push(e), e > hardBar && (vaxHardCompletion = !0), vaxHardHiScoreRT = Math.max.apply(Math, cookie.scoresRT[2])) : (cookie.scores[2].push(e), e > hardBar && (vaxHardCompletion = !0), vaxHardHiScore = Math.max.apply(Math, cookie.scores[2]))), $.cookie.json = !1, void 0 == difficultyString && ($.cookie("customNodes", customNodeChoice), $.cookie("customNeighbors", customNeighborChoice), $.cookie("customVaccines", customVaccineChoice), $.cookie("customOutbreaks", customOutbreakChoice), $.cookie("customRefusers", customRefuserChoice));
+  "easy" == difficultyString && (
+    speed ? (
+      cookie.scoresRT[0].push(e),
+      e > easyBar &&
+      (vaxEasyCompletion = !0),
+      vaxEasyHiScoreRT = Math.max.apply(Math, cookie.scoresRT[0])
+    ) : (
+      cookie.scores[0].push(e),
+      e > easyBar &&
+      (vaxEasyCompletion = !0),
+      vaxEasyHiScore = Math.max.apply(Math, cookie.scores[0])
+    )
+  ), "medium" == difficultyString && (
+    speed ? (
+      cookie.scoresRT[1].push(e),
+      e > mediumBar &&
+      (vaxMediumCompletion = !0),
+      vaxMediumHiScoreRT = Math.max.apply(Math, cookie.scoresRT[1])
+    ) : (
+      cookie.scores[1].push(e),
+      e > mediumBar && (vaxMediumCompletion = !0),
+      vaxMediumHiScore = Math.max.apply(Math, cookie.scores[1])
+    )
+  ), "hard" == difficultyString && (
+    speed ? (
+      cookie.scoresRT[2].push(e),
+      e > hardBar &&
+      (vaxHardCompletion = !0),
+      vaxHardHiScoreRT = Math.max.apply(Math, cookie.scoresRT[2])
+    ) : (
+      cookie.scores[2].push(e),
+      e > hardBar &&
+      (vaxHardCompletion = !0),
+      vaxHardHiScore = Math.max.apply(Math, cookie.scores[2])
+    )
+  ),
+  Cookies.set("json", !1),
+  void 0 == difficultyString && (
+    Cookies.set("customNodes",  customNodeChoice),
+    Cookies.set("customNeighbors",  customNeighborChoice),
+    Cookies.set("customVaccines",  customVaccineChoice),
+    Cookies.set("customOutbreaks",  customOutbreakChoice),
+    Cookies.set("customRefusers",  customRefuserChoice)
+  );
   var t = cookie.scores[0],
     i = cookie.scores[1],
     a = cookie.scores[2],
@@ -776,7 +887,8 @@ function writeCookiesJSON() {
       scores: o,
       scoresRT: c
     };
-  $.removeCookie("vaxCookie"), $.cookie("vaxCookie", JSON.stringify(d), {
+  Cookies.remove("vaxCookie"),
+  Cookies.set("vaxCookie", d, {
     expires: 365,
     path: "/"
   })
@@ -785,30 +897,46 @@ function writeCookiesJSON() {
 function generateStackedBarChart() {
   var e = 125,
     t = 320,
-    i = d3.select(".gameSVG").append("svg").attr("class", "stacked").attr("width", e).attr("height", t).attr("x", 20).attr("y", 150).append("svg:g").attr("transform", "translate(10,320)");
-  x = d3.scale.ordinal().rangeRoundBands([0, e - 50]), y = d3.scale.linear().range([0, t]), z = d3.scale.ordinal().range(["#b7b7b7", "#85BC99", "#d9d678", "#ef5555"]);
+    i = d3.select(".gameSVG").append("svg")
+      .attr("class", "stacked")
+      .attr("width", e)
+      .attr("height", t)
+      .attr("x", 20)
+      .attr("y", 150)
+      .append("svg:g")
+      .attr("transform", "translate(10,320)");
+  x = d3.scale.ordinal().rangeRoundBands([0, e - 50]),
+  y = d3.scale.linear().range([0, t]),
+  z = d3.scale.ordinal().range(["#b7b7b7", "#85BC99", "#d9d678", "#ef5555"]);
   var a = [
       [1, countSavedGAME(), numberVaccinated, numberQuarantined, numberOfIndividuals - numberQuarantined - numberVaccinated - countSavedGAME()]
     ],
-    o = ["uninfected", "vaccinated", "quarantined", "infected"].map(function(e, t) {
-      return a.map(function(e, i) {
-        return {
-          x: i,
-          y: e[t + 1]
-        }
-      })
-    }),
-    r = d3.layout.stack()(o);
+  o = ["uninfected", "vaccinated", "quarantined", "infected"].map(function(e, t) {
+    return a.map(function(e, i) {
+      return {
+        x: i,
+        y: e[t + 1]
+      }
+    })
+  }),
+  r = d3.layout.stack()(o);
   x.domain(r[0].map(function(e) {
     return e.x
-  })), y.domain([0, d3.max(r[r.length - 1], function(e) {
+  })),
+  y.domain([0, d3.max(r[r.length - 1], function(e) {
     return e.y0 + e.y
   })]);
-  var n = i.selectAll("g.valgroup").data(r).enter().append("svg:g").attr("class", "valgroup").style("fill", function(e, t) {
-    return z(t)
-  }).attr("id", function(e, t) {
-    return 0 == t ? "uninfected" : 1 == t ? "infected" : 2 == t ? "quarantined" : 3 == t ? "vaccinated" : void 0
-  });
+  var n = i.selectAll("g.valgroup")
+    .data(r)
+    .enter()
+    .append("svg:g")
+    .attr("class", "valgroup")
+    .style("fill", function(e, t) {
+      return z(t)
+    })
+    .attr("id", function(e, t) {
+      return 0 == t ? "uninfected" : 1 == t ? "infected" : 2 == t ? "quarantined" : 3 == t ? "vaccinated" : void 0
+    });
   n.selectAll("rect").data(function(e) {
     return e
   }).enter().append("svg:rect").attr("x", function(e) {
@@ -964,38 +1092,91 @@ function loadConclusionText() {
   var e = Math.round(100 * ((numberSaved + numberQuarantined + numberVaccinated) / numberOfIndividuals)).toFixed(0);
   d3.select("#pinNodesDiv").remove();
   var t, i;
-  "easy" == difficultyString && (i = vaxEasyHiScore, t = easyBar), "medium" == difficultyString && (i = vaxMediumHiScore, t = mediumBar), "hard" == difficultyString && (i = vaxHardHiScore, t = hardBar), null == difficultyString && (i = e), d3.select(".gameSVG").append("text").attr("class", "bestScore").attr("x", backX + 25).attr("y", 420).style("font-family", "Nunito").style("fill", "#707070").style("font-size", "24px").style("font-weight", "500").text("Best Score: " + i + "%");
+  "easy" == difficultyString && (i = vaxEasyHiScore, t = easyBar),
+  "medium" == difficultyString && (i = vaxMediumHiScore, t = mediumBar),
+  "hard" == difficultyString && (i = vaxHardHiScore, t = hardBar),
+  null == difficultyString && (i = e),
+  d3.select(".gameSVG").append("text")
+    .attr("class", "bestScore")
+    .attr("x", backX + 25)
+    .attr("y", 420)
+    .style("font-family", "Nunito")
+    .style("fill", "#707070")
+    .style("font-size", "24px")
+    .style("font-weight", "500")
+    .text("Best Score: " + i + "%");
   var a;
-  "easy" == difficultyString && (a = "Easy"), "medium" == difficultyString && (a = "Medium"), "hard" == difficultyString && (a = "Hard"), null == difficultyString && (a = "Custom", i = e);
-  var o = "https://twitter.com/intent/tweet?original_referer=http%3A%2F%2F.vax.herokuapp.com&text=I just stopped an epidemic in its tracks! Can you can beat " + i + "%25 on " + a + "? Fight the outbreak at&url=http%3A%2F%2Fvax.herokuapp.com",
-    r = "https://www.facebook.com/sharer.php?s=100&p[title]=Vax! | Gamifying Epidemic Prevention&p[summary]=I just stopped an epidemic in its tracks! Can you beat " + i + "% on " + a + "?&p[url]=https://vax.herokuapp.com";
-  d3.select(".gameSVG").append("image").attr("x", 150).attr("y", 355).attr("height", "50px").attr("width", "50px").attr("xlink:href", "/assets/facebook_icon.png").attr("id", "facebook").style("padding", "12px 7px 0px 7px").style("cursor", "pointer").on("click", function() {
-    window.location.href = r
-  }),
-  d3.select(".gameSVG").append("image").attr("x", 215).attr("y", 355).attr("height", "50px").attr("width", "50px").attr("xlink:href", "/assets/twitter_icon.png").attr("id", "twitter").style("padding", "12px 7px 0px 7px").style("width", "25px").style("cursor", "pointer").on("click", function() {
-    window.location.href = o
-  }),
-  d3.select(".gameSVG").append("image").attr("x", 280).attr("y", 355).attr("height", "50px").attr("width", "50px").attr("xlink:href", "/assets/googleplus_icon.png").attr("id", "twitter").style("padding", "12px 7px 0px 7px").style("width", "25px").style("cursor", "pointer").on("click", function() {
-    window.location.href = "https://plus.google.com/share?url=https://vax.herokuapp.com"
-  }),
-  null == difficultyString ? (d3.select(".gameSVG").append("text").attr("class", "recapText").attr("x", 260).attr("y", 525).text("Well done, you saved " + e + "% of the network."), d3.select(".gameSVG").append("text").attr("class", "recapButton").attr("x", 470).attr("y", 590).text("Retry").on("click", retry).on("mouseover", function() {
-    d3.select(this).style("fill", "#2692F2")
-  }).on("mouseout", function() {
-    d3.select(this).style("fill", "#707070")
-  })) : e > t ? (d3.select(".gameSVG").append("text").attr("class", "recapText").attr("x", 260).attr("y", 525).text("Well done, you saved " + e + "% of the network."), d3.select(".gameSVG").append("text").attr("class", "recapButton").attr("x", 355).attr("y", 590).text("Retry").on("click", retry).on("mouseover", function() {
-    d3.select(this).style("fill", "#2692F2")
-  }).on("mouseout", function() {
-    d3.select(this).style("fill", "#707070")
-  }),
-  d3.select(".gameSVG").append("text").attr("class", "recapButton").attr("x", 580).attr("y", 590).text("Next").on("click", next).on("mouseover", function() {
-    d3.select(this).style("fill", "#2692F2")
-  }).on("mouseout", function() {
-    d3.select(this).style("fill", "#707070")
-  })) : (d3.select(".gameSVG").append("text").attr("class", "recapText").attr("x", 200).attr("y", 525).text("Save " + t + "% of the network to unlock the next stage."), d3.select(".gameSVG").append("text").attr("class", "recapButton").attr("x", 470).attr("y", 590).text("Retry").on("click", retry).on("mouseover", function() {
-    d3.select(this).style("fill", "#2692F2")
-  }).on("mouseout", function() {
-    d3.select(this).style("fill", "#707070")
-  }))
+  "easy" == difficultyString && (a = "Easy"),
+  "medium" == difficultyString && (a = "Medium"),
+  "hard" == difficultyString && (a = "Hard"),
+  null == difficultyString && (a = "Custom", i = e);
+  null == difficultyString ? (
+    d3.select(".gameSVG").append("text")
+      .attr("class", "recapText")
+      .attr("x", 260)
+      .attr("y", 525)
+      .text("Well done, you saved " + e + "% of the network."),
+    d3.select(".gameSVG").append("text")
+      .attr("class", "recapButton")
+      .attr("x", 470)
+      .attr("y", 590)
+      .text("Retry")
+      .on("click", retry)
+      .on("mouseover", function() {
+        d3.select(this).style("fill", "#2692F2")
+      })
+      .on("mouseout", function() {
+        d3.select(this).style("fill", "#707070")
+      })
+  ) : e > t ? (
+    d3.select(".gameSVG").append("text")
+      .attr("class", "recapText")
+      .attr("x", 260)
+      .attr("y", 525)
+      .text("Well done, you saved " + e + "% of the network."),
+    d3.select(".gameSVG").append("text")
+      .attr("class", "recapButton")
+      .attr("x", 355)
+      .attr("y", 590)
+      .text("Retry")
+      .on("click", retry)
+      .on("mouseover", function() {
+        d3.select(this).style("fill", "#2692F2")
+      })
+      .on("mouseout", function() {
+        d3.select(this).style("fill", "#707070")
+      }),
+    d3.select(".gameSVG").append("text")
+      .attr("class", "recapButton")
+      .attr("x", 580)
+      .attr("y", 590)
+      .text("Next")
+      .on("click", next)
+      .on("mouseover", function() {
+        d3.select(this).style("fill", "#2692F2")
+      })
+      .on("mouseout", function() {
+        d3.select(this).style("fill", "#707070")
+      })
+  ) : (
+    d3.select(".gameSVG").append("text")
+      .attr("class", "recapText")
+      .attr("x", 200)
+      .attr("y", 525)
+      .text("Save " + t + "% of the network to unlock the next stage."),
+    d3.select(".gameSVG").append("text")
+      .attr("class", "recapButton")
+      .attr("x", 470)
+      .attr("y", 590)
+      .text("Retry")
+      .on("click", retry)
+      .on("mouseover", function() {
+        d3.select(this).style("fill", "#2692F2")
+      })
+      .on("mouseout", function() {
+        d3.select(this).style("fill", "#707070")
+      })
+  )
 }
 
 function retry() {
@@ -1008,8 +1189,17 @@ function retry() {
 }
 
 function next() {
-  if (d3.select(".gameSVG").remove(), graph = {}, timestep = 0, diseaseIsSpreading = !1, timeToStop = !1, hideGameQuarantine(), "hard" == difficultyString || null == difficultyString) window.location.href = "/game.html";
-  else {
+  if (
+    d3.select(".gameSVG").remove(),
+    graph = {},
+    timestep = 0,
+    diseaseIsSpreading = !1,
+    timeToStop = !1,
+    hideGameQuarantine(),
+    "hard" == difficultyString || null == difficultyString
+  ){
+    window.location.href = "/game.html";
+  } else {
     if ("easy" == difficultyString) return difficultyString = "medium", initBasicGame("medium"), void 0;
     if ("medium" == difficultyString) return difficultyString = "hard", initBasicGame("hard"), void 0
   }
@@ -1034,83 +1224,24 @@ function getCartesianDistance(e, t) {
   return Math.pow(n + s, .5)
 }
 
-var numberOfIndividuals,
-  meanDegree,
-  rewire = .1,
-  graph = {},
-  force,
-  node,
-  link,
-  scenarioTitle,
-  resizingParameter = 2,
-  invisibleParameter = 1.9,
-  transmissionRate,
-  recoveryRate,
-  transmissionRates = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1],
-  recoveryRates = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1],
-  independentOutbreaks = 1,
-  numberVaccinated,
-  numberQuarantined,
-  numberSaved,
-  numberInfected,
-  numberOfRefusers,
-  gameSVG,
-  width = window.innerWidth,
-  height = window.innerHeight,
-  charge = -900,
-  friction = .9,
-  numberOfVaccines = 0,
-  vaccineSupply = 0,
-  difficultyString, customNodeChoice, customNeighborChoice, customVaccineChoice, customOutbreakChoice, customRefuserChoice, timestep = 0,
-  newInfections = [],
-  exposureEdges = [],
-  xyCoords = [],
-  diseaseIsSpreading = !1,
-  timeToStop = !1,
-  infectedBar, uninfectedBar, infectedHeight, uninfectedHeight, game, easyBar = 70,
-  mediumBar = 50,
-  hardBar = 40,
-  vaxEasyCompletion, vaxMediumCompletion, vaxHardCompletion, vaxEasyHiScore, vaxMediumHiScore, vaxHardHiScore, vaxEasyHiScoreRT, vaxMediumHiScoreRT, vaxHardHiScoreRT, easyScores, mediumScores, hardScores, scores = {
-    easy: easyScores,
-    medium: mediumScores,
-    hard: hardScores
-  },
-  easyScoresRT, mediumScoresRT, hardScoresRT, scoresRT = {
-    easy: easyScoresRT,
-    medium: mediumScoresRT,
-    hard: hardScoresRT
-  },
-  currentNode, currentElement, cookie = {},
-  pop, best, current, originalLocation = [0, 0],
-  newLocation = [0, 0],
-  dragStartDateObject, dragStartMillis, dragEndDateObject, dragEndMillis, clickTime, dragDistanceThreshold = 10,
-  clickTimeThreshold = 100;
-
 let difficultySelection = d3.select("#difficulty-selection");
 
 d3.select("#difficulty-easy").on("click", function() {
   difficultyString = "easy",
-  initBasicGame(difficultyString)
+  initBasicGame(difficultyString);
 });
 
 d3.select("#difficulty-medium").on("click", function() {
   difficultyString = "medium",
-  initBasicGame(difficultyString)
+  initBasicGame(difficultyString);
 });
 
 d3.select("#difficulty-hard").on("click", function() {
   difficultyString = "hard",
-  initBasicGame(difficultyString)
+  initBasicGame(difficultyString);
 });
 
-difficultySelection.append("div")
-  .attr("class", "degreeToggleMenuTrue")
-  .text("Show Degree")
-  .style("width", "200px")
-  .style("color", "#2692F2")
-  .style("font-weight", "500")
-  .style("font-size", "18px")
-  .style("cursor", "pointer")
+difficultySelection.select(".degreeToggleMenuTrue")
   .on("click", function() {
     d3.select(".degreeToggleMenuTrue")
       .style("color", "#2692F2")
@@ -1121,36 +1252,14 @@ difficultySelection.append("div")
     toggleDegree = !0
   });
 
-difficultySelection.append("div")
-  .attr("class", "degreeToggleMenuFalse")
-  .text("Hide Degree")
-  .style("width", "200px")
-  .style("color", "#BABABA")
-  .style("font-weight", "300")
-  .style("font-size", "18px")
-  .style("cursor", "pointer")
+difficultySelection.select(".degreeToggleMenuFalse")
   .on("click", function() {
     d3.select(".degreeToggleMenuTrue").style("color", "#BABABA").style("font-weight", "300");
     d3.select(".degreeToggleMenuFalse").style("color", "#2692F2").style("font-weight", "500");
     toggleDegree = !1
   });
 
-difficultySelection.append("div")
-  .attr("class", "quarantineModeOptions")
-  .text("Quarantine Phase")    .style("top", "165px")
-  .style("width", "200px")
-  .style("color", "#707070")
-  .style("font-weight", "300")
-  .style("font-size", "22px");
-
-difficultySelection.append("div")
-  .attr("class", "turnBasedTrue")
-  .text("Turn-based")
-  .style("width", "200px")
-  .style("color", "#2692F2")
-  .style("font-weight", "500")
-  .style("font-size", "18px")
-  .style("cursor", "pointer")
+difficultySelection.select(".turnBasedTrue")
   .on("click", function() {
     d3.select(".turnBasedTrue")
       .style("color", "#2692F2")
@@ -1164,21 +1273,14 @@ difficultySelection.append("div")
     vaxHardHiScore == -1 / 0 || d3.select("#score-hard").text("(Best: " + vaxHardHiScore + "%)");
   });
 
-difficultySelection.append("div")
-  .attr("class", "realTimeTrue")
-  .text("Real-time")
-  .style("width", "200px")
-  .style("color", "#BABABA")
-  .style("font-weight", "300")
-  .style("font-size", "18px")
-  .style("cursor", "pointer")
+difficultySelection.select(".realTimeTrue")
   .on("click", function() {
     d3.select(".turnBasedTrue")
       .style("color", "#BABABA")
       .style("font-weight", "300");
     d3.select(".realTimeTrue")
-      .style("color", "#2692F2")
-      .style("font-weight", "500");
+    .style("color", "#2692F2")
+    .style("font-weight", "500");
     speed = !0;
     0 > vaxEasyHiScoreRT ? d3.select("#score-easy").text("") : d3.select("#score-easy").text("(Best: " + vaxEasyHiScoreRT + "%)");
     0 > vaxMediumHiScoreRT ? d3.select("#score-medium").text("") : d3.select("#score-medium").text("(Best: " + vaxMediumHiScoreRT + "%)");
@@ -1187,5 +1289,13 @@ difficultySelection.append("div")
 
 window.setTimeout(readCookiesJSON, 500),
 jQuery(document).bind("keydown", function(e) {
-  void 0 != currentNode && (e.shiftKey && 32 == e.which ? (currentNode.fixed = !1, currentElement.style("stroke-width", "2px")) : 32 == e.which && (currentNode.fixed = !0, currentElement.style("stroke-width", "3px")))
+  void 0 != currentNode && (
+    e.shiftKey && 32 == e.which ? (
+      currentNode.fixed = !1,
+      currentElement.style("stroke-width", "2px")
+    ) : 32 == e.which && (
+      currentNode.fixed = !0,
+      currentElement.style("stroke-width", "3px")
+    )
+  )
 });
