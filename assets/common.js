@@ -6,7 +6,7 @@ function generateSmallWorld(t, e, n) {
       status: "S",
       group: null,
       edges: [],
-      marked: !1,
+      marked: false,
       degree: null,
       bcScore: null,
       exposureTimestep: null,
@@ -37,7 +37,7 @@ function generateSmallWorld(t, e, n) {
     var x = {
       source: i[b][0],
       target: i[b][1],
-      remove: !1
+      remove: false
     };
     testDuplicate(y, x) || y.push(x)
   }
@@ -45,6 +45,7 @@ function generateSmallWorld(t, e, n) {
     v.links = y,
     v
 }
+
 function removeDuplicateEdges(t) {
   for (var e = 0; e < t.nodes.length; e++)
     for (var n = t.nodes[e], r = 0; r < t.nodes.length; r++) {
@@ -52,42 +53,46 @@ function removeDuplicateEdges(t) {
       spliceDuplicateEdges(n, i, t)
     }
 }
+
 function testDuplicate(t, e) {
-  for (var n = e.source, r = e.target, i = !1, o = 0; o < t.length; o++) {
-    var a = t[o]
-      , u = a.source
-      , s = a.target;
-    u == n && s == r && (i = !0),
-      u == r && s == n && (i = !0)
+  for (var n = e.source, r = e.target, i = false, o = 0; o < t.length; o++) {
+    var a = t[o], u = a.source, s = a.target;
+    u == n && s == r && (i = true),
+    u == r && s == n && (i = true)
   }
   return i
 }
+
 function degree(t) {
   for (var e = 0, n = 0; n < graph.links.length; n++)
     (graph.links[n].source == t || graph.links[n].target == t) && e++;
   return e
 }
+
 function findNeighbors(t) {
   for (var e = [], n = 0; n < graph.links.length; n++) {
     var r = graph.links[n];
     r.source == t && e.push(r.target),
-      r.target == t && e.push(r.source)
+    r.target == t && e.push(r.source)
   }
   return e
 }
+
 function findLink(t, e) {
   for (var n = null, r = 0; r < graph.links.length; r++)
     graph.links[r].source == t && graph.links[r].target == e && (n = graph.links[r]),
-      graph.links[r].target == t && graph.links[r].source == e && (n = graph.links[r]);
+    graph.links[r].target == t && graph.links[r].source == e && (n = graph.links[r]);
   return n
 }
+
 function edgeExists(t, e, n) {
-  for (var r = !1, i = 0; i < n.links.length; i++) {
+  for (var r = false, i = 0; i < n.links.length; i++) {
     var o = n.links[i];
-    o.source.id == t.id ? o.target.id == e.id && (r = !0) : o.target.id == t.id && o.source.id == e.id && (r = !0)
+    o.source.id == t.id ? o.target.id == e.id && (r = true) : o.target.id == t.id && o.source.id == e.id && (r = true)
   }
   return r
 }
+
 function spliceDuplicateEdges(t, e, n) {
   for (var r = 0, i = 0; i < n.links.length; i++) {
     var o = n.links[i];
@@ -98,16 +103,19 @@ function spliceDuplicateEdges(t, e, n) {
   }
   return r
 }
+
 function removeVaccinatedNodes(t) {
   for (var e = [], n = 0; n < t.nodes.length; n++)
     "V" != t.nodes[n].status && "Q" != t.nodes[n].status && "VOL" != t.nodes[n].status && e.push(t.nodes[n]);
   return e
 }
+
 function removeOldLinks(t) {
   for (var e = [], n = 0; n < t.links.length; n++)
     "V" != t.links[n].source.status && "V" != t.links[n].target.status && "R" != t.links[n].source.status && "R" != t.links[n].target.status && "Q" != t.links[n].source.status && "Q" != t.links[n].target.status && 1 != t.links[n].remove && e.push(t.links[n]);
   return e
 }
+
 function assignEdgeListsToNodes(t) {
   for (var e = 0; e < t.nodes.length; e++)
     for (var n = t.nodes[e], r = 0; r < t.links.length; r++) {
@@ -116,17 +124,19 @@ function assignEdgeListsToNodes(t) {
     }
   return t
 }
+
 function updateCommunities() {
   twine = [],
-    twineIndex = 0,
-    groupCounter = 1;
+  twineIndex = 0,
+  groupCounter = 1;
   for (var t = 0; t < graph.nodes.length; t++) {
     var e = graph.nodes[t];
     e.group = null,
-      e.marked = !1
+    e.marked = false
   }
   assignGroups()
 }
+
 function assignGroups() {
   for (; ;) {
     var t = getUnmarkedUngroupedNodes();
@@ -137,6 +147,7 @@ function assignGroups() {
     pacMan(t[0]) && 0 != t.length && groupCounter++
   }
 }
+
 function getUnmarkedUngroupedNodes() {
   for (var t = [], e = 0; e < graph.nodes.length; e++) {
     var n = graph.nodes[e];
@@ -144,11 +155,12 @@ function getUnmarkedUngroupedNodes() {
   }
   return t
 }
+
 function pacMan(t) {
   t.group = groupCounter;
   var e = null;
   if (null != t && !t.marked) {
-    t.marked = !0,
+    t.marked = true,
       t.group = groupCounter,
       twine.push(t);
     for (var n = degree(t), r = findNeighbors(t), i = 0; n > i; i++) {
@@ -157,11 +169,12 @@ function pacMan(t) {
         pacMan(e))
     }
   }
-  return null != t || 0 == twineIndex ? !0 : (twineIndex = -1,
+  return null != t || 0 == twineIndex ? true : (twineIndex = -1,
     e = twine[twineIndex],
     pacMan(e),
     void 0)
 }
+
 function findLargestCommunity() {
   communities = [];
   for (var t = 0; groupCounter > t; t++)
@@ -171,6 +184,7 @@ function findLargestCommunity() {
       graph.nodes[n].group == e && communities[e]++;
   largestCommunity = Array.max(communities)
 }
+
 function convertGraphForNetX(t) {
   for (var e = [], n = [], r = jsnx.Graph(), i = 0; i < t.nodes.length; i++)
     e.push(t.nodes[i].id);
@@ -184,10 +198,12 @@ function convertGraphForNetX(t) {
     r.add_edges_from(n),
     r
 }
+
 function assignDegree() {
   for (var t = 0; t < graph.nodes.length; t++)
     graph.nodes[t].degree = degree(graph.nodes[t])
 }
+
 function computeBetweennessCentrality() {
   G = convertGraphForNetX(graph);
   for (var t = jsnx.betweenness_centrality(G), e = 0; e < graph.nodes.length; e++)
@@ -195,6 +211,7 @@ function computeBetweennessCentrality() {
       graph.nodes[e].bcScore = t[e];
   return t
 }
+
 function shuffle(t) {
   for (var e, n, r = t.length; r; e = Math.floor(Math.random() * r),
     n = t[--r],
@@ -203,6 +220,7 @@ function shuffle(t) {
     ;
   return t
 }
+
 function getTailoredNodes() {
   for (var t = [], e = 0; 13 > e; e++) {
     var n = {
@@ -210,7 +228,7 @@ function getTailoredNodes() {
       status: "S",
       group: null,
       edges: [],
-      marked: !1,
+      marked: false,
       degree: null,
       bcScore: null,
       exposureTimestep: null,
@@ -220,195 +238,197 @@ function getTailoredNodes() {
   }
   return t
 }
+
 function cleanup(t, e) {
-  var n = []
-    , r = {};
+  var n = [], r = {};
   for (var i in t)
     r[t[i][e]] = t[i];
   for (i in r)
     n.push(r[i]);
   return n
 }
+
 function getTailoredLinks() {
   var t = [];
   return t = [{
     source: tailoredNodes[0],
     target: tailoredNodes[1],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[0],
     target: tailoredNodes[4],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[0],
     target: tailoredNodes[5],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[0],
     target: tailoredNodes[12],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[1],
     target: tailoredNodes[0],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[1],
     target: tailoredNodes[12],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[1],
     target: tailoredNodes[2],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[1],
     target: tailoredNodes[7],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[1],
     target: tailoredNodes[10],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[4],
     target: tailoredNodes[0],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[4],
     target: tailoredNodes[5],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[4],
     target: tailoredNodes[6],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[5],
     target: tailoredNodes[0],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[5],
     target: tailoredNodes[4],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[5],
     target: tailoredNodes[6],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[12],
     target: tailoredNodes[0],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[12],
     target: tailoredNodes[1],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[12],
     target: tailoredNodes[2],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[12],
     target: tailoredNodes[3],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[2],
     target: tailoredNodes[1],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[2],
     target: tailoredNodes[12],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[2],
     target: tailoredNodes[10],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[2],
     target: tailoredNodes[3],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[2],
     target: tailoredNodes[8],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[2],
     target: tailoredNodes[9],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[2],
     target: tailoredNodes[11],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[7],
     target: tailoredNodes[1],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[10],
     target: tailoredNodes[1],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[10],
     target: tailoredNodes[2],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[10],
     target: tailoredNodes[8],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[3],
     target: tailoredNodes[12],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[3],
     target: tailoredNodes[2],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[3],
     target: tailoredNodes[8],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[3],
     target: tailoredNodes[6],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[8],
     target: tailoredNodes[2],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[8],
     target: tailoredNodes[10],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[8],
     target: tailoredNodes[3],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[8],
     target: tailoredNodes[9],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[9],
     target: tailoredNodes[2],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[9],
     target: tailoredNodes[8],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[11],
     target: tailoredNodes[2],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[6],
     target: tailoredNodes[4],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[6],
     target: tailoredNodes[5],
-    remove: !1
+    remove: false
   }, {
     source: tailoredNodes[6],
     target: tailoredNodes[3],
-    remove: !1
+    remove: false
   }]
 }
+
 function getWeakTieNodes() {
   for (var t = [], e = 0; 30 > e; e++) {
     var n = {
@@ -416,7 +436,7 @@ function getWeakTieNodes() {
       status: "S",
       group: null,
       edges: [],
-      marked: !1,
+      marked: false,
       degree: null,
       bcScore: null,
       exposureTimestep: null,
@@ -426,154 +446,156 @@ function getWeakTieNodes() {
   }
   return t
 }
+
 function getWeakTieLinks() {
   var t = [{
     source: weakTieNodes[1],
     target: weakTieNodes[3],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[3],
     target: weakTieNodes[6],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[4],
     target: weakTieNodes[1],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[4],
     target: weakTieNodes[2],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[4],
     target: weakTieNodes[3],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[4],
     target: weakTieNodes[8],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[4],
     target: weakTieNodes[9],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[5],
     target: weakTieNodes[16],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[6],
     target: weakTieNodes[1],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[8],
     target: weakTieNodes[12],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[8],
     target: weakTieNodes[13],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[9],
     target: weakTieNodes[15],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[10],
     target: weakTieNodes[6],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[10],
     target: weakTieNodes[18],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[12],
     target: weakTieNodes[2],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[12],
     target: weakTieNodes[9],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[13],
     target: weakTieNodes[2],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[13],
     target: weakTieNodes[17],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[14],
     target: weakTieNodes[13],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[14],
     target: weakTieNodes[15],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[15],
     target: weakTieNodes[2],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[15],
     target: weakTieNodes[5],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[16],
     target: weakTieNodes[14],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[16],
     target: weakTieNodes[17],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[18],
     target: weakTieNodes[19],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[19],
     target: weakTieNodes[10],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[19],
     target: weakTieNodes[24],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[19],
     target: weakTieNodes[28],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[21],
     target: weakTieNodes[23],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[21],
     target: weakTieNodes[28],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[22],
     target: weakTieNodes[18],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[23],
     target: weakTieNodes[19],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[23],
     target: weakTieNodes[22],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[24],
     target: weakTieNodes[26],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[28],
     target: weakTieNodes[24],
-    remove: !1
+    remove: false
   }, {
     source: weakTieNodes[29],
     target: weakTieNodes[26],
-    remove: !1
+    remove: false
   }];
   return t
 }
+
 function generateFrontGraph() {
   var t = -3e4;
   frontGraph = {},
@@ -607,29 +629,31 @@ function generateFrontGraph() {
       return 3 == t.id ? "#f1d2d2" : "#d5d5d5"
     }).call(frontForce.drag)
 }
+
 function frontTick() {
   frontNode.attr("cx", function (t) {
     return t.x = Math.max(8, Math.min(width - 50, t.x))
   }).attr("cy", function (t) {
     return t.y = Math.max(8, Math.min(450, t.y))
   }),
-    frontLink.attr("x1", function (t) {
-      return t.source.x
-    }).attr("y1", function (t) {
-      return t.source.y
-    }).attr("x2", function (t) {
-      return t.target.x
-    }).attr("y2", function (t) {
-      return t.target.y
-    })
+  frontLink.attr("x1", function (t) {
+    return t.source.x
+  }).attr("y1", function (t) {
+    return t.source.y
+  }).attr("x2", function (t) {
+    return t.target.x
+  }).attr("y2", function (t) {
+    return t.target.y
+  })
 }
+
 var rerun = false;
+
 function selectIndexCase() {
-  var t = graph.nodes.length
-    , e = 0;
+  var t = graph.nodes.length, e = 0;
   do {
-    var n = Math.floor(Math.random() * t)
-      , r = graph.nodes[n];
+    var n = Math.floor(Math.random() * t),
+        r = graph.nodes[n];
     e++
   } while ("V" == r.status && 500 > e);
   500 == e && (r.status = "S"),
@@ -637,10 +661,12 @@ function selectIndexCase() {
     this.indexCase = r,
     infectIndividual(this.indexCase)
 }
+
 function infectIndividual(t) {
   ("S" == t.status || "REF" == t.status) && (t.status = "I",
     t.exposureTimestep = this.timestep)
 }
+
 function exposeIndividual(t, e) {
   exposureEdges = [],
     ("S" == t.status || "REF" == t.status) && (t.status = "E",
@@ -648,6 +674,7 @@ function exposeIndividual(t, e) {
   for (var n = 0; n < graph.links.length; n++)
     graph.links[n].source.id == e.id && graph.links[n].target.id == t.id ? exposureEdges.push(graph.links[n]) : graph.links[n].source.id == t.id && graph.links[n].target.id == e.id && exposureEdges.push(graph.links[n])
 }
+
 function updateExposures() {
   for (var t = [], e = 0; e < graph.nodes.length; e++)
     "E" == graph.nodes[e].status && (graph.nodes[e].status = "I",
@@ -655,6 +682,7 @@ function updateExposures() {
       graph.nodes[e].exposureTimestep = this.timestep);
   return t
 }
+
 function infectedToRecovered(t) {
   if ("I" == t.status) {
     var e = this.timestep - t.exposureTimestep;
@@ -665,15 +693,18 @@ function infectedToRecovered(t) {
     }
   }
 }
+
 function forceRecovery(t) {
   "I" == t.status && (t.status = "R")
 }
+
 function stateChanges() {
   for (var t = 0; t < graph.nodes.length; t++) {
     var e = graph.nodes[t];
     infectedToRecovered(e)
   }
 }
+
 function infection() {
   transmissionRate = rerun ? 1 : .35;
   for (var t = 0, e = 0; e < graph.nodes.length; e++)
@@ -692,44 +723,45 @@ function infection() {
       }
     }
   if (t > 0)
-    rerun = !1,
+    rerun = false,
       transmissionRate = .35;
   else {
     if (game ? detectGameCompletion() : detectCompletion(),
       timeToStop)
       return;
-    rerun = !0,
+    rerun = true,
       transmissionRate = 1,
       infection()
   }
 }
+
 function infection_noGuaranteedTransmission() {
   for (var t = 0, e = 0; e < graph.nodes.length; e++)
     if ("S" == graph.nodes[e].status) {
       for (var n = graph.nodes[e], r = findNeighbors(n), i = [], o = 0, a = 0; a < r.length; a++) {
         var u = r[a];
-        "I" == u.status && (i.push(r[a]),
-          o++)
+        "I" == u.status && (i.push(r[a]), o++)
       }
       var s = 1 - Math.pow(1 - transmissionRate, o);
       if (Math.random() < s) {
         t++;
-        var l = shuffle(i)
-          , c = l[0];
+        var l = shuffle(i), c = l[0];
         exposeIndividual(n, c)
       }
     }
 }
+
 function getStatuses(t) {
   for (var e = 0, n = 0, r = 0, i = 0, o = 0; o < graph.nodes.length; o++) {
     var a = graph.nodes[o];
     "S" == a.status && e++,
-      "I" == a.status && n++,
-      "R" == a.status && r++,
-      "V" == a.status && i++
+    "I" == a.status && n++,
+    "R" == a.status && r++,
+    "V" == a.status && i++;
   }
   return "S" == t ? e : "I" == t ? n : "R" == t ? r : "V" == t ? i : void 0
 }
+
 function detectEndGame() {
   updateCommunities();
   for (var t = 0, e = 1; numberOfCommunities + 1 > e; e++) {
@@ -741,9 +773,9 @@ function detectEndGame() {
     }
     r > 0 && n > 0 && t++
   }
-  0 == t && diseaseIsSpreading && (endGame = !0,
-    diseaseIsSpreading = !1,
-    timeToStop = !0,
+  0 == t && diseaseIsSpreading && (endGame = true,
+    diseaseIsSpreading = false,
+    timeToStop = true,
     !vaccinateMode || quarantineMode || game || (animatePathogens_thenUpdate(),
       tutorialUpdate()))
 }

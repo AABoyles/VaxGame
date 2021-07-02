@@ -1,6 +1,6 @@
 function init_hiSVG() {
   var t = "undefined" != typeof InstallTrigger,
-    e = !1 || document.documentMode;
+    e = false || document.documentMode;
   hiSVG = t || e ? d3.select("body").append("svg").attr({
     width: 950,
     height: 600
@@ -36,8 +36,8 @@ var hiSVG,
   hiGuideText,
   backgroundHex = "#F1F1F1",
   textHex = "#707070",
-  diseaseIsSpreading = !1,
-  game = !1,
+  diseaseIsSpreading = false,
+  game = false,
   timestep = 0;
 
   init_hiSpace();
@@ -133,11 +133,11 @@ var hiSVG,
         for (var t = 0; t < graph.nodes.length; t++) graph.nodes[t].status = Math.random() < .1 ? "V" : "S", graph.nodes[t].infectedBy = null, graph.nodes[t].exposureTimestep = null;
         do var a = Math.floor(Math.random() * graph.nodes.length); while ("V" == graph.nodes[a].status);
         var s = [];
-        timestep = 0, graph.nodes[a].status = "I", graph.nodes[a].infectedBy = null, graph.nodes[a].exposureTimestep = timestep, diseaseIsSpreading = !0, timeToStop = !1, timestep++, d3.selectAll(".node").style("fill", function(e) {
+        timestep = 0, graph.nodes[a].status = "I", graph.nodes[a].infectedBy = null, graph.nodes[a].exposureTimestep = timestep, diseaseIsSpreading = true, timeToStop = false, timestep++, d3.selectAll(".node").style("fill", function(e) {
           return "V" == e.status ? "#76A788" : "S" == e.status ? "#b7b7b7" : "I" == e.status ? "#ef5555" : void 0
         }), recoveryRate = .05, transmissionRate = .25, hiTimesteps()
       }
-      10 == hiGuide && d3.select("#hiGuideText").html("In most cases, everyone who wasn't vaccinated will be infected. <br> But let's play with the dials and run a <i>few thousand simulations...</i> <br><b>For Science!</b>"), 11 == hiGuide && (d3.selectAll(".legendText").transition().duration(500).attr("opacity", 0), d3.selectAll(".legendCircle").transition().duration(500).attr("opacity", 0), recoveryRate = .2, transmissionRate = .9, mainScreen = !0, hiNodeSize = 13, drawRepeatNet(), plotBar(outbreakFrequency), simSet = 0, runVisualizationSims()), 12 == hiGuide && d3.select("#hiGuideText").html("For <b>measles</b>, the vaccination coverage required <br> to achieve herd immunity is about <b>90%</b>!"), 13 == hiGuide && d3.select("#hiGuideText").html("Let's try that again, but with a less transmissible disease like influenza..."), 14 == hiGuide && (d3.selectAll(".repeatRemovalText").remove(), d3.select("#playNetSVG").remove(), d3.selectAll("#barChart").remove(), d3.select("#hiSVG").append("text").attr("class", "fluText").attr("x", 320).attr("y", 350).style("font-size", "60px").style("font-family", "Nunito").style("font-weight", 700).style("fill", "#707070").attr("opacity", 1).text("Influenza"), d3.select("#hiSVG").append("text").attr("class", "fluText").attr("x", 383).attr("y", 400).style("font-size", "30px").style("font-family", "Nunito").style("font-weight", 400).style("fill", "#707070").attr("opacity", 1).text("R₀ = 1.5-3")), 15 == hiGuide && (flu = !0, d3.selectAll(".fluText").remove(), transmissionRate = .2, recoveryRate = .53, outbreakFrequency = [0, 0, 0, 0, 0, 0, 0, 0, 0], mainScreen = !0, hiNodeSize = 13, drawRepeatNet(), plotBar(outbreakFrequency), simSet = 0, runVisualizationSims()), 16 == hiGuide && d3.select("#hiGuideText").html("For <b>influenza</b>, the herd immunity threshold is just over <b>50%</b>. <br> But the real world doesn't always work out like simulations..."), 17 == hiGuide && d3.select("#hiGuideText").html("Flu vaccines are not always effective, so higher vaccination coverages are necessary."), 18 == hiGuide && d3.select("#hiGuideText").html("So let's try that again but allow vaccines to fail for various reasons... <br><br> <div align=center> People who have <i>already been exposed</i></div>  <div align=center> <i>Weak</i> immune responses</div> <div align=center> <i>Defective</i> doses</div> "), 19 == hiGuide && (d3.select("#hiGuideText").html("Here, we'll see that the vaccination coverage threshold required to achieve <br> herd immunity is higher (right-shifted) as a result of vaccine failure."), d3.select("#playNetSVG").remove(), d3.selectAll("#barChart").remove(), flu = !0, imperfectVaccines = !0, d3.selectAll(".fluText").remove(), transmissionRate = .2, recoveryRate = .53, outbreakFrequency = [0, 0, 0, 0, 0, 0, 0, 0, 0], mainScreen = !0, hiNodeSize = 13, drawRepeatNet(), plotBar(outbreakFrequency), simSet = 0, runVisualizationSims()), 20 == hiGuide && d3.select("#hiGuideText").html("Now that we understand <i>herd immunity</i> in more detail, <br> I'll leave you with one caveat..."), 21 == hiGuide && d3.select("#hiGuideText").html("Herd Immunity <b>only</b> works when susceptible individuals are <b>randomly</b> dispersed in the network."), 22 == hiGuide && d3.select("#hiGuideText").html("But herd immunity is <b>undermined when susceptibility is clustered</b> <br> (e.g., a community of vaccine refusers)."), 23 == hiGuide && (d3.select("#hiGuideText").html("Keep yourself and your loved ones vaccinated. <br> If not for your own benefit then consider it <br> a favor to those with weakened immune systems. <br> (Young, sick, and elderly)"), d3.select("#advanceHI").text("Game >").on("click", function() {
+      10 == hiGuide && d3.select("#hiGuideText").html("In most cases, everyone who wasn't vaccinated will be infected. <br> But let's play with the dials and run a <i>few thousand simulations...</i> <br><b>For Science!</b>"), 11 == hiGuide && (d3.selectAll(".legendText").transition().duration(500).attr("opacity", 0), d3.selectAll(".legendCircle").transition().duration(500).attr("opacity", 0), recoveryRate = .2, transmissionRate = .9, mainScreen = true, hiNodeSize = 13, drawRepeatNet(), plotBar(outbreakFrequency), simSet = 0, runVisualizationSims()), 12 == hiGuide && d3.select("#hiGuideText").html("For <b>measles</b>, the vaccination coverage required <br> to achieve herd immunity is about <b>90%</b>!"), 13 == hiGuide && d3.select("#hiGuideText").html("Let's try that again, but with a less transmissible disease like influenza..."), 14 == hiGuide && (d3.selectAll(".repeatRemovalText").remove(), d3.select("#playNetSVG").remove(), d3.selectAll("#barChart").remove(), d3.select("#hiSVG").append("text").attr("class", "fluText").attr("x", 320).attr("y", 350).style("font-size", "60px").style("font-family", "Nunito").style("font-weight", 700).style("fill", "#707070").attr("opacity", 1).text("Influenza"), d3.select("#hiSVG").append("text").attr("class", "fluText").attr("x", 383).attr("y", 400).style("font-size", "30px").style("font-family", "Nunito").style("font-weight", 400).style("fill", "#707070").attr("opacity", 1).text("R₀ = 1.5-3")), 15 == hiGuide && (flu = true, d3.selectAll(".fluText").remove(), transmissionRate = .2, recoveryRate = .53, outbreakFrequency = [0, 0, 0, 0, 0, 0, 0, 0, 0], mainScreen = true, hiNodeSize = 13, drawRepeatNet(), plotBar(outbreakFrequency), simSet = 0, runVisualizationSims()), 16 == hiGuide && d3.select("#hiGuideText").html("For <b>influenza</b>, the herd immunity threshold is just over <b>50%</b>. <br> But the real world doesn't always work out like simulations..."), 17 == hiGuide && d3.select("#hiGuideText").html("Flu vaccines are not always effective, so higher vaccination coverages are necessary."), 18 == hiGuide && d3.select("#hiGuideText").html("So let's try that again but allow vaccines to fail for various reasons... <br><br> <div align=center> People who have <i>already been exposed</i></div>  <div align=center> <i>Weak</i> immune responses</div> <div align=center> <i>Defective</i> doses</div> "), 19 == hiGuide && (d3.select("#hiGuideText").html("Here, we'll see that the vaccination coverage threshold required to achieve <br> herd immunity is higher (right-shifted) as a result of vaccine failure."), d3.select("#playNetSVG").remove(), d3.selectAll("#barChart").remove(), flu = true, imperfectVaccines = true, d3.selectAll(".fluText").remove(), transmissionRate = .2, recoveryRate = .53, outbreakFrequency = [0, 0, 0, 0, 0, 0, 0, 0, 0], mainScreen = true, hiNodeSize = 13, drawRepeatNet(), plotBar(outbreakFrequency), simSet = 0, runVisualizationSims()), 20 == hiGuide && d3.select("#hiGuideText").html("Now that we understand <i>herd immunity</i> in more detail, <br> I'll leave you with one caveat..."), 21 == hiGuide && d3.select("#hiGuideText").html("Herd Immunity <b>only</b> works when susceptible individuals are <b>randomly</b> dispersed in the network."), 22 == hiGuide && d3.select("#hiGuideText").html("But herd immunity is <b>undermined when susceptibility is clustered</b> <br> (e.g., a community of vaccine refusers)."), 23 == hiGuide && (d3.select("#hiGuideText").html("Keep yourself and your loved ones vaccinated. <br> If not for your own benefit then consider it <br> a favor to those with weakened immune systems. <br> (Young, sick, and elderly)"), d3.select("#advanceHI").text("Game >").on("click", function() {
         window.location.href = "/game.html"
       })), d3.select("#hiGuideText").transition().duration(500).style("color", textHex)
     }
@@ -192,7 +192,7 @@ var hiSVG,
     }
     
     function hiTimesteps() {
-      return console.log(simSet), d3.select("#advanceHI").transition().duration(500).style("color", "#707070"), simSet >= 9 ? (d3.selectAll(".node").style("fill", "#b7b7b7"), void 0) : (infection_noGuaranteedTransmission(), stateChanges(), newInfections = [], newInfections = updateExposures(), timestep++, detectVizSimCompletion(), !timeToStop && diseaseIsSpreading ? (animateGamePathogens_thenUpdateHI(), window.setTimeout(hiTimesteps, visualizationTimesteps)) : (11 > hiGuide && d3.select("#advanceHI").transition().duration(500).style("color", "white"), animateGamePathogens_thenUpdateHI(), mainScreen && (updateBarChart(), 9 == simSet && 0 == meanFinalEpidemicSizes[8] && (diseaseIsSpreading = !1, timeToStop = !0, meanFinalEpidemicSizes[8] = .01, console.log(meanFinalEpidemicSizes), d3.select("#advanceHI").transition().duration(500).style("color", "white")), meanFinalEpidemicSizes[8] > 0 && (d3.select("#advanceHI").transition().duration(500).style("color", "white"), diseaseIsSpreading = !1))), void 0)
+      return d3.select("#advanceHI").transition().duration(500).style("color", "#707070"), simSet >= 9 ? (d3.selectAll(".node").style("fill", "#b7b7b7"), void 0) : (infection_noGuaranteedTransmission(), stateChanges(), newInfections = [], newInfections = updateExposures(), timestep++, detectVizSimCompletion(), !timeToStop && diseaseIsSpreading ? (animateGamePathogens_thenUpdateHI(), window.setTimeout(hiTimesteps, visualizationTimesteps)) : (11 > hiGuide && d3.select("#advanceHI").transition().duration(500).style("color", "white"), animateGamePathogens_thenUpdateHI(), mainScreen && (updateBarChart(), 9 == simSet && 0 == meanFinalEpidemicSizes[8] && (diseaseIsSpreading = false, timeToStop = true, meanFinalEpidemicSizes[8] = .01, d3.select("#advanceHI").transition().duration(500).style("color", "white")), meanFinalEpidemicSizes[8] > 0 && (d3.select("#advanceHI").transition().duration(500).style("color", "white"), diseaseIsSpreading = false))), void 0)
     }
     
     function updateBarChart() {
@@ -200,7 +200,7 @@ var hiSVG,
     }
     
     function detectVizSimCompletion() {
-      0 == getStatuses("I") && timestep > 0 && (timeToStop = !0, diseaseIsSpreading = !1)
+      0 == getStatuses("I") && timestep > 0 && (timeToStop = true, diseaseIsSpreading = false)
     }
     
     function findMaxConnectedByType(e, t) {
@@ -240,7 +240,7 @@ var hiSVG,
           var t = Math.floor(Math.random() * graph.nodes.length);
           e++
         } while ("V" == graph.nodes[t].status && 100 > e);
-        e > 100 && (t = 0), timestep = 0, graph.nodes[t].status = "I", graph.nodes[t].infectedBy = null, graph.nodes[t].exposureTimestep = timestep, diseaseIsSpreading = !0, timeToStop = !1
+        e > 100 && (t = 0), timestep = 0, graph.nodes[t].status = "I", graph.nodes[t].infectedBy = null, graph.nodes[t].exposureTimestep = timestep, diseaseIsSpreading = true, timeToStop = false
       }
     }
     var redistribute, globalMax, globalMaxConnected, globalMaxConnectedLabel, susceptibleNeighbors, meanFinalEpidemicSizes = [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -251,9 +251,9 @@ var hiSVG,
       simSet = 0,
       vaxCoverage = 0,
       visualizationTimesteps = 400,
-      mainScreen = !1,
-      flu = !1,
-      imperfectVaccines = !1,
+      mainScreen = false,
+      flu = false,
+      imperfectVaccines = false,
       newInfections = [];
 
       function initSimVars(e, a) {
@@ -302,7 +302,7 @@ var hiSVG,
       }
       
       function singleSim(e) {
-        diseaseIsSpreading = !0, vaccinateRandomly(e), selectIndexCase(), outbreakTimesteps()
+        diseaseIsSpreading = true, vaccinateRandomly(e), selectIndexCase(), outbreakTimesteps()
       }
       
       function outbreakTimesteps() {
@@ -310,7 +310,7 @@ var hiSVG,
       }
       
       function detectSimCompletion() {
-        0 == getStatuses("I") && timestep > 0 ? (timeToStop = !0, diseaseIsSpreading = !1) : outbreakTimesteps()
+        0 == getStatuses("I") && timestep > 0 ? (timeToStop = true, diseaseIsSpreading = false) : outbreakTimesteps()
       }
       
       function vaccinateRandomly(e) {
@@ -322,7 +322,7 @@ var hiSVG,
       }
       
       function resetInitials() {
-        timestep = 0, diseaseIsSpreading = !1, timeToStop = !1;
+        timestep = 0, diseaseIsSpreading = false, timeToStop = false;
         for (var e = 0; e < graph.nodes.length; e++) {
           var a = graph.nodes[e];
           a.status = "S", a.infectedBy = null, a.exposureTimestep = null

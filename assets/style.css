@@ -1,14 +1,12 @@
 @import url(https://fonts.googleapis.com/css?family=Nunito:300,400,700);
 
 html {
-  background-color: #f1f1f1;
   height: 100%;
+  min-width: 552px;
 }
 
 body {
   background-color: #f1f1f1;
-  display: inline-block;
-  position: relative;
   width: 100%;
   vertical-align: top;
   font-family: "Nunito";
@@ -26,6 +24,7 @@ body svg {
   left: 0;
   width: 100%;
   height: 100%;
+  background-color: #f1f1f1;
 }
 
 a {
@@ -55,229 +54,6 @@ svg|a text, text svg|a {
 svg|a:hover, svg|a:active {
   fill: blue;
   text-decoration: none;
-}
-
-.about {
-  position: absolute;
-  right: 0px;
-  bottom: 50px;
-  position: absolute;
-  background: #85bc99;
-  font-weight: 300;
-  font-size: 14px;
-  color: white;
-  width: 155px;
-  height: 25px;
-  padding-top: 10px;
-  padding-left: 12px;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: 5px 6px #838383;
-  -webkit-transition-duration: 0.5s;
-  -moz-transition-duration: 0.5s;
-  -o-transition-duration: 0.5s;
-  transition-duration: 0.5s
-}
-
-.about a {
-  color: white;
-  text-decoration: none;
-}
-
-.about a:hover {
-  color: "707070";
-  text-decoration: none;
-}
-
-#scenarioAccordion {
-  position: absolute;
-  left: 250px;
-  top: 130px;
-  width: 60%;
-  padding-bottom: 20px
-}
-
-.scenarioDiv {
-  height: 295px
-}
-
-.scenarioText {
-  font-size: 18px;
-  font-weight: 300
-}
-
-.difficultyPopover {
-  position: absolute;
-  display: inline;
-  background: #f1f1f1;
-  top: -60px;
-  left: 175px;
-  height: 150px;
-  width: 150px;
-  color: #f1f1f1;
-  font-size: 18px;
-  font-weight: 300;
-  box-shadow: 5px 6px #f1f1f1;
-  -webkit-transition-duration: 1s;
-  -moz-transition-duration: 1s;
-  -o-transition-duration: 1s;
-  transition-duration: 1s
-}
-
-#difficultyPopoverHeader {
-  color: #85bc99;
-  font-size: 20px;
-  font-weight: 500
-}
-
-.popoverStat {
-  margin-top: 5px;
-  font-weight: 200;
-  font-size: 18px;
-  display: block;
-  text-align: center;
-  text-justify: center
-}
-
-.scenarioHead {
-  font-size: 20px;
-  font-weight: 300
-}
-
-#workSVG,
-#theaterSVG,
-#restaurantSVG,
-#clubSVG,
-#shopSVG,
-#originalSVG {
-  pointer-events: all;
-  position: absolute;
-  width: 175px;
-  height: 200px
-}
-
-#workEasy,
-#workMedium,
-#workHard,
-#theaterEasy,
-#theaterMedium,
-#theaterHard,
-#restaurantEasy,
-#restaurantMedium,
-#restaurantHard,
-#clubEasy,
-#clubMedium,
-#clubHard,
-#shopEasy,
-#shopMedium,
-#shopHard,
-#originalEasy,
-#originalMedium,
-#originalHard {
-  fill: #707070;
-  font-weight: 500;
-  font-size: 20px;
-  cursor: pointer
-}
-
-.scenarioThumbnail {
-  position: relative;
-  left: 0px;
-  display: inline
-}
-
-.scenarioAction {
-  position: relative;
-  display: inline
-}
-
-.lock {
-  position: absolute;
-  height: 25px;
-  width: 25px;
-  left: 10px
-}
-
-.scenarioSavesDiv {
-  position: absolute;
-  background: #85bc99;
-  font-weight: 300;
-  font-size: 22px;
-  color: #f1f1f1;
-  width: 100px;
-  height: 125px;
-  padding-top: 5px;
-  padding-left: 12px;
-  text-align: center;
-  top: 185px;
-  left: -12px;
-  cursor: pointer;
-  box-shadow: 5px 6px #838383;
-  -webkit-transition-duration: 0.5s;
-  -moz-transition-duration: 0.5s;
-  -o-transition-duration: 0.5s;
-  transition-duration: 0.5s
-}
-
-.savesText {
-  font-weight: 300;
-  font-size: 18px;
-  fill: #f1f1f1
-}
-
-.verifyUnlockBox {
-  position: absolute;
-  background: #85bc99;
-  float: right;
-  color: "#f1f1f1";
-  width: 300px;
-  height: 100px;
-  padding-top: 30px;
-  padding-left: 0px;
-  top: -100px;
-  left: 35%;
-  box-shadow: 5px 6px #838383;
-  -webkit-transition-duration: 0.5s;
-  -moz-transition-duration: 0.5s;
-  -o-transition-duration: 0.5s;
-  transition-duration: 0.5s
-}
-
-.verifyUnlockHeader {
-  position: absolute;
-  top: 20px;
-  left: 40px;
-  color: #f1f1f1;
-  font-weight: 500;
-  font-size: 28px
-}
-
-.verifyUnlockCost {
-  position: absolute;
-  left: 56px;
-  top: 100px;
-  font-weight: 300;
-  font-size: 24px
-}
-
-.verifyUnlockYes {
-  position: absolute;
-  left: 80px;
-  top: 62px;
-  color: #f1f1f1;
-  font-weight: 300;
-  font-size: 22px;
-  cursor: pointer
-}
-
-.verifyUnlockNo {
-  position: absolute;
-  left: 180px;
-  top: 62px;
-  color: #f1f1f1;
-  font-weight: 300;
-  font-size: 22px;
-  cursor: pointer
 }
 
 .scenarioTitle {
@@ -316,7 +92,7 @@ svg|a:hover, svg|a:active {
   position: relative;
   font-size: 10px;
   font-weight: 300;
-  color: "white";
+  color: #ffffff;
   top: -32px;
   right: -20px
 }
@@ -391,7 +167,7 @@ svg|a:hover, svg|a:active {
   position: relative;
   font-size: 10px;
   font-weight: 300;
-  color: "white";
+  color: #ffffff;
   top: -32px;
   right: -15px
 }
@@ -474,7 +250,7 @@ svg|a:hover, svg|a:active {
   position: relative;
   background: #85bc99;
   float: right;
-  color: "white";
+  color: #ffffff;
   width: 500px;
   height: 45px;
   top: -75px;
@@ -498,20 +274,21 @@ svg|a:hover, svg|a:active {
   margin: 0px
 }
 
-.menuBox {
+#lesson-box {
   position: absolute;
   background: #85bc99;
-  top: 0px;
+  bottom: 6px;
   padding: 5px;
   text-align: center;
-  right: 0;
+  right: 5px;
   visibility: visible;
   display: inline;
   box-shadow: 5px 7px #838383;
   -webkit-transition-duration: 0.5s;
   -moz-transition-duration: 0.5s;
   -o-transition-duration: 0.5s;
-  transition-duration: 0.5s
+  transition-duration: 0.5s;
+  z-index: 1;
 }
 
 .guideTextSVG {
@@ -590,7 +367,7 @@ svg|a:hover, svg|a:active {
   cursor: pointer
 }
 
-.homeMenu {
+.home-menu {
   position:absolute;
   bottom: 1rem;
   right: 1rem;
@@ -652,10 +429,6 @@ svg|a:hover, svg|a:active {
   stroke-width: 3px
 }
 
-svg {
-  background-color: #f1f1f1
-}
-
 .faqTitle {
   font-size: 32px;
   font-weight: 400;
@@ -667,6 +440,7 @@ svg {
 }
 
 .faq-wrapper {
+  padding-top: 1.9rem;
   margin-top: 60px;
   margin-bottom: 100px
 }
@@ -703,30 +477,8 @@ svg {
   transition-duration: 0.5s
 }
 
-#vax-logo {
-  position: absolute;
-  background: #85bc99;
-  color: white;
-  padding: 12px;
-  padding-left: 24px;
-  text-align: center;
-  top: calc(3rem - 12px);
-  left: -12px;
-  cursor: pointer;
-  box-shadow: 5px 6px #838383;
-  -webkit-transition-duration: 0.5s;
-  -moz-transition-duration: 0.5s;
-  -o-transition-duration: 0.5s;
-  transition-duration: 0.5s;
-  z-index: 1;
-}
-
-#vax-logo h1{
-  margin-bottom: 0;
-}
-
 #faq-wrapper{
-  padding: 0 calc(3rem + 84px);
+  padding: 1.9rem calc(3rem + 84px) 0 calc(3rem + 84px);
 }
 
 #pinNodesDiv {
@@ -765,35 +517,49 @@ svg {
   margin: 10px
 }
 
-.gameMenuBox {
+#global-menu {
   position: absolute;
-  background: #85bc99;
-  float: right;
-  color: "white";
-  width: 250px;
-  height: 45px;
-  padding-top: 30px;
-  padding-left: 0px;
-  bottom: 0%;
-  right: 0px;
-  box-shadow: 5px 6px #838383;
+  color: #ffffff;
+  top: 0;
+  left: 0;
+  z-index: 1;
   -webkit-transition-duration: 0.5s;
   -moz-transition-duration: 0.5s;
   -o-transition-duration: 0.5s;
   transition-duration: 0.5s
 }
 
-.gameMenuBoxItem {
-  position: relative;
-  float: right;
-  font-size: 15px;
-  font-weight: 300;
+#global-logo {
+  display: inline-block;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  background: #85bc99;
+  box-shadow: 5px 6px #838383;
+  -webkit-transition-duration: 0.5s;
+  -moz-transition-duration: 0.5s;
+  -o-transition-duration: 0.5s;
+  transition-duration: 0.5s;
+  z-index: 1;
+}
+
+#global-logo h1{
+  margin-bottom: 0;
+}
+
+.global-link-box {
+  display: inline-block;
+  vertical-align: top;
+  box-shadow: 5px 6px #838383;
+  background: #85bc99;
+  margin-left:-6px;
+}
+
+.global-link-box a {
   color: #ffffff;
-  padding-top: 0px;
-  right: 10px;
   padding-right: 30px;
   padding-left: 28px;
-  cursor: pointer
+  cursor: pointer;
 }
 
 .newGameHeader {
@@ -888,16 +654,6 @@ svg {
   margin-bottom: -25px
 }
 
-#nodeSlider .ui-slider-handle,
-#degreeSlider .ui-slider-handle,
-#vaccineSlider .ui-slider-handle,
-#outbreakSlider .ui-slider-handle,
-#refuserSlider .ui-slider-handle {
-  width: 2em;
-  height: 2em;
-  margin-top: -9px
-}
-
 .recapText {
   position: relative;
   fill: #707070;
@@ -960,7 +716,7 @@ svg {
 }
 
 #settings-wrapper {
-  padding: 0 calc(3rem + 84px);
+  padding: 1.9rem calc(3rem + 84px) 0 calc(3rem + 84px);
 }
 
 .prior-score {

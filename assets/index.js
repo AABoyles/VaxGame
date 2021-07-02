@@ -2,43 +2,35 @@ let svg = d3.select("svg"),
     width = window.innerWidth;
     height = window.innerHeight;
 
-let frontNodes = [
+let nodes = [
   {id: 0},
   {id: 1},
   {id: 2},
   {id: 3}
 ];
-let frontLinks = [
+let links = [
   {
-    source: frontNodes[0],
-    target: frontNodes[1]
+    source: nodes[0],
+    target: nodes[1]
   }, {
-    source: frontNodes[1],
-    target: frontNodes[2]
+    source: nodes[1],
+    target: nodes[2]
   }, {
-    source: frontNodes[2],
-    target: frontNodes[0]
+    source: nodes[2],
+    target: nodes[0]
   }, {
-    source: frontNodes[1],
-    target: frontNodes[3]
+    source: nodes[1],
+    target: nodes[3]
   }
 ];
 
-frontLink = svg.select("g.links").selectAll(".link")
-  .data(frontLinks)
-  .enter()
-  .append("line")
-  .style("fill", "#707070")
-  .style("stroke-width", "10px")
-  .style("stroke", "#d5d5d5");
+frontLink = svg.select("g.links").selectAll("line")
+  .data(links)
+  .join("line");
 
-frontNode = svg.select("g.nodes").selectAll(".node")
-  .data(frontNodes)
+frontNode = svg.select("g.nodes").selectAll("circle")
+  .data(nodes)
   .join("circle")
-    .attr("r", 50)
-    .style("stroke", "#b7b7b7")
-    .style("stroke-width", "10px")
-    .attr("fill", t => ((3 == t.id) ? "#f1d2d2" : "#d5d5d5"))
     .call(d3.drag()
       .on("start", dragstarted)
       .on("drag", dragged)
@@ -61,9 +53,9 @@ function dragended(event) {
   event.subject.fy = null;
 }
 
-simulation = d3.forceSimulation(frontNodes)
+simulation = d3.forceSimulation(nodes)
   .force("charge", d3.forceManyBody().strength(-1000))
-  .force("links", d3.forceLink(frontLinks).distance(300))
+  .force("links", d3.forceLink(links).distance(300))
   .force("center", d3.forceCenter(width/2, height/2))
   .on("tick", () => {
     frontNode

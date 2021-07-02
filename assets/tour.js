@@ -1,28 +1,28 @@
 var rewire = .1,
     meanDegree = 3,
-    diseaseIsSpreading = !1,
+    diseaseIsSpreading = false,
     transmissionRate = .35,
     recoveryRate = 0,
     maxRecoveryTime = 1e6,
     numberVaccinated = 0,
-    timeToStop = !0,
+    timeToStop = true,
     guideRailsPosition = 0,
-    postInitialOutbreak = !1,
-    finalStop = !1,
-    endGame = !1,
-    intervention = !1,
-    tutorial = !1,
+    postInitialOutbreak = false,
+    finalStop = false,
+    endGame = false,
+    intervention = false,
+    tutorial = false,
     charge = -400,
     newInfections = [],
     xyCoords = [],
     vax = 1,
     currentFlash = 0,
-    keepFlashing = !0,
+    keepFlashing = true,
     xFlashCounter = 0,
     numberQuarantined = 0,
     vaccineSupply = 0,
-    vaccinateMode = !1,
-    quarantineMode = !1,
+    vaccinateMode = false,
+    quarantineMode = false,
     twine = [],
     twineIndex = 0,
     numberOfCommunities = null,
@@ -33,7 +33,7 @@ var rewire = .1,
     timestep = 0,
     indexCase = null,
     opacityIndex = 0,
-    lessonText, start = !1,
+    lessonText, start = false,
     nextX = 750,
     nextY = 140,
     guideXCoord = 400,
@@ -43,29 +43,29 @@ var rewire = .1,
     height = window.innerheight,
     rewire = .1,
     meanDegree = 3,
-    diseaseIsSpreading = !1,
+    diseaseIsSpreading = false,
     transmissionRate = .35,
     recoveryRate = 0,
     maxRecoveryTime = 1e6,
     numberVaccinated = 0,
-    timeToStop = !0,
+    timeToStop = true,
     guideRailsPosition = 0,
-    postInitialOutbreak = !1,
-    finalStop = !1,
-    endGame = !1,
-    intervention = !1,
-    tutorial = !1,
+    postInitialOutbreak = false,
+    finalStop = false,
+    endGame = false,
+    intervention = false,
+    tutorial = false,
     charge = -400,
     newInfections = [],
     xyCoords = [],
     vax = 1,
     currentFlash = 0,
-    keepFlashing = !0,
+    keepFlashing = true,
     xFlashCounter = 0,
     numberQuarantined = 0,
     vaccineSupply = 0,
-    vaccinateMode = !1,
-    quarantineMode = !1,
+    vaccinateMode = false,
+    quarantineMode = false,
     twine = [],
     twineIndex = 0,
     numberOfCommunities = null,
@@ -76,7 +76,7 @@ var rewire = .1,
     timestep = 0,
     indexCase = null,
     opacityIndex = 0,
-    lessonText, start = !1,
+    lessonText, start = false,
     nextX = 750,
     nextY = 140,
     guideXCoord = 400,
@@ -84,7 +84,7 @@ var rewire = .1,
     guide2YCoordChange = 35,
     width = window.innerWidth,
     height = window.innerHeight,
-    svg,
+    svg = d3.select('body').append('svg'),
     guideTextSVG,
     force,
     link,
@@ -95,13 +95,13 @@ var rewire = .1,
     infectedBar,
     uninfectedBar,
     exposureEdges = [],
-    simulation = !0,
-    vaccineResearched = !1,
-    pleaseWait = !1,
-    game = !1,
+    simulation = true,
+    vaccineResearched = false,
+    pleaseWait = false,
+    game = false,
     startButton,
-    backEnable = !0,
-    nextEnable = !0,
+    backEnable = true,
+    nextEnable = true,
     pop,
     tailoredGraph = {},
     tailoredNodes = getTailoredNodes(),
@@ -177,11 +177,11 @@ function tutorialUpdate() {
         try {
           pop.play()
         } catch (e) {}
-        vaccinateMode = !1;
+        vaccinateMode = false;
         d3.status = "Q";
       }
       if (vaccinateMode) {
-        if (quarantineMode = !1, 0 >= vaccineSupply) return window.alert("Out of Vaccines!"),
+        if (quarantineMode = false, 0 >= vaccineSupply) return window.alert("Out of Vaccines!"),
         void 0;
         t.status = "V";
         try {
@@ -202,7 +202,7 @@ function addOneFriend() {
   trivialGraph.links.push({
     source: trivialGraph.nodes[0],
     target: trivialGraph.nodes[1],
-    remove: !1
+    remove: false
   });
   stepWiseUpdate();
 }
@@ -231,7 +231,7 @@ function centerElement(t, e) {
 function buildGraph() {
   trivialGraph.nodes.splice(1, 1);
   trivialGraph.links = [];
-  tutorial = !0;
+  tutorial = true;
   for (var t = 0; t < graph.nodes.length; t++){
     edgeExists(graph.nodes[t], trivialGraph.nodes[0], graph) && trivialGraph.nodes.push(graph.nodes[t]);
   }
@@ -241,7 +241,7 @@ function buildGraph() {
         var a = {
           source: trivialGraph.nodes[e],
           target: trivialGraph.nodes[n],
-          remove: !1
+          remove: false
         };
         if (testDuplicate(trivialGraph.links, a)) continue;
         trivialGraph.links.push(a);
@@ -369,7 +369,7 @@ function tutorialTimesteps() {
   detectCompletion();
   this.timestep++;
   timeToStop ? (
-    animatePathogens_thenUpdate(), nextEnable = !0, resetBack(), resetNext(), resetMenu()) : (
+    animatePathogens_thenUpdate(), nextEnable = true, resetBack(), resetNext(), resetMenu()) : (
     animatePathogens_thenUpdate(), window.setTimeout(tutorialTimesteps, 1e3)
   )
 }
@@ -404,10 +404,10 @@ function detectCompletion() {
     "I" == n.status && t++
   }
   t == numberOfIndividuals ? (
-    timeToStop = !0,
-    diseaseIsSpreading = !1
+    timeToStop = true,
+    diseaseIsSpreading = false
   ) : detectEndGame();
-  finalStop && (detectEndGame(), endGame && (timeToStop = !0));
+  finalStop && (detectEndGame(), endGame && (timeToStop = true));
 }
 
 function timedRemoval(t) {
@@ -424,7 +424,7 @@ function slideOutStepwiseNav(t) {
     .attr("font-size", "18px")
     .attr("opacity", 1)
     .attr("x", width/2)
-    .attr("y", height - 200)
+    .attr("y", window.innerHeight - 200)
     .style("cursor", "pointer")
     .style("font-family", "Nunito")
     .style("fill", "#707070")
@@ -438,7 +438,7 @@ function slideOutStepwiseNav(t) {
         var t = Math.floor(Math.random() * numberOfIndividuals);
         graph.nodes[t].status = "I";
         removeDuplicateEdges(graph);
-        diseaseIsSpreading = !0;
+        diseaseIsSpreading = true;
         tutorialUpdate();
         tutorialTimesteps();
       }
@@ -474,7 +474,7 @@ function clearStepwiseNavBar() {
 }
 
 function clearMenuBox() {
-  d3.select(".menuBox").remove()
+  d3.select(".lesson-box").remove()
 }
 
 function initMenuBox() {
@@ -543,7 +543,7 @@ function initNavBar() {
         guideRailsPosition--,
         guideRailsReverse(),
         9 == guideRailsPosition && (loadSyringe(),
-        backEnable = !1, resetBack()))
+        backEnable = false, resetBack()))
       )
     });
   nextArrow = d3.select(".stepwiseNavSVG").append("text")
@@ -677,7 +677,7 @@ function menuConfirm() {
         d3.select(".guide2")
           .attr("opacity", 1);
         createMenuBox(1)
-        keepFlashing = !1
+        keepFlashing = false
       }, 501);
     });
     svg.append("text")
@@ -781,7 +781,7 @@ function flashRedX() {
 
 function unFixNodes(t) {
   for (var e = 0; e < t.nodes.length; e++){
-    1 == t.nodes[e].fixed && (t.nodes[e].fixed = !1);
+    1 == t.nodes[e].fixed && (t.nodes[e].fixed = false);
   }
 }
 
@@ -807,7 +807,7 @@ function loadSyringe() {
 }
 
 function hideSyringe() {
-  vaccinationMode = !1;
+  vaccinationMode = false;
   d3.select(".actionVax")
     .style("right", "-200px");
   svg
@@ -822,7 +822,7 @@ function loadQuarantine() {
   d3.select("#quarantineText")
     .style("color", "white"),
   vaccinateMode && hideSyringe(),
-  quarantineMode = !0;
+  quarantineMode = true;
   d3.select(".actionQuarantine")
     .style("visibility", "visible")
     .style("right", "0px")
@@ -840,7 +840,7 @@ function loadQuarantine() {
 }
 
 function hideQuarantine() {
-  quarantineMode = !1;
+  quarantineMode = false;
   d3.select(".actionQuarantine")
     .style("right", "-200px"),
   svg
@@ -866,9 +866,9 @@ function flashNode() {
         } catch (n) {}
         vaccineSupply--;
         numberVaccinated++;
-        keepFlashing = !1;
-        nextEnable = !0;
-        backEnable = !1;
+        keepFlashing = false;
+        nextEnable = true;
+        backEnable = false;
         resetBack();
         resetNext();
         tutorialUpdate();
@@ -896,9 +896,9 @@ function flashNodes() {
         } catch (e) {}
         vaccineSupply--;
         numberVaccinated++;
-        keepFlashing = !1;
-        nextEnable = !0;
-        backEnable = !1;
+        keepFlashing = false;
+        nextEnable = true;
+        backEnable = false;
         resetBack();
         resetNext();
         tutorialUpdate()
@@ -909,14 +909,14 @@ function flashNodes() {
 
 function activateVaccinationMode() {
   wiggle && wiggleHack();
-  wiggle = !1;
-  vaccinateMode = !0;
+  wiggle = false;
+  vaccinateMode = true;
   d3.selectAll(".node")
     .style("cursor", "url(/assets/vax_cursor.cur)"),
   svg
     .style("cursor", "url(/assets/vax_cursor.cur)"),
-  vaccineResearched = !0;
-  intervention = !0;
+  vaccineResearched = true;
+  intervention = true;
   d3.select(".vaccineCounterText")
     .style("color", "white")
     .text(vaccineSupply + " / " + vax);
@@ -926,8 +926,8 @@ function activateVaccinationMode() {
 
 function activateQuarantineMode() {
   friction = .9;
-  vaccinateMode = !1;
-  quarantineMode = !0;
+  vaccinateMode = false;
+  quarantineMode = true;
   d3.selectAll(".node")
     .style("cursor", "url(/assets/vax_cursor.cur)");
   svg
@@ -944,11 +944,11 @@ function startQuarantineOutbreak() {
     graph.nodes.exposureTimestep = null;
   }
   graph.nodes[5].status = "I";
-  diseaseIsSpreading = !0;
+  diseaseIsSpreading = true;
   resetMenu();
   timestep = 0;
-  timeToStop = !1;
-  postInitialOutbreak = !0;
+  timeToStop = false;
+  postInitialOutbreak = true;
   numberOfIndividuals = graph.nodes.length;
   quarantineUpdate();
 }
@@ -963,7 +963,7 @@ function quarantineTimesteps() {
   this.timestep++, detectCompletion();
   timeToStop ? (
     animateQuarantinePathogens_thenUpdate(),
-    nextEnable = !0,
+    nextEnable = true,
     resetNext(),
     resetMenu()
     ) : animateQuarantinePathogens_thenUpdate();
@@ -1159,7 +1159,7 @@ guide2 = guideTextSVG.append("text")
   .style("fill", "#707070")
   .style("font-weight", 300);
 
-start ? guideRails() : (start = !0, initTutorial());
+start ? guideRails() : (start = true, initTutorial());
 
 function wiggleHack() {
   d3.select(".guide").text("Try dragging nodes around to get a different perspective.")
@@ -1181,7 +1181,7 @@ function resetBack() {
     }).on("click", function() {
       backEnable && (diseaseIsSpreading || (guideRailsPosition--, guideRailsReverse(),
       9 == guideRailsPosition && (loadSyringe(),
-      backEnable = !1, resetBack())))
+      backEnable = false, resetBack())))
     });
 }
 
@@ -1209,13 +1209,13 @@ function disableNext() {
     .on("click", function() {});
 }
 function wipeOut() {
-  endGame = !1;
-  timeToStop = !1;
-  diseaseIsSpreading = !1;
-  vaccinateMode = !1;
-  quarantineMode = !1;
-  finalStop = !1;
-  intervention = !1;
+  endGame = false;
+  timeToStop = false;
+  diseaseIsSpreading = false;
+  vaccinateMode = false;
+  quarantineMode = false;
+  finalStop = false;
+  intervention = false;
   for (var e = 0; e < tailoredNodes.length; e++){
     tailoredNodes[e].status = "S";
     tailoredNodes[e].exposureTimestep = null;
@@ -1267,9 +1267,9 @@ function restoreVaccineLesson() {
 function restoreQuarantineLesson() {
   numberQuarantined = 0;
   d3.select(".startButton").remove();
-  diseaseIsSpreading = !1;
-  backEnable = !1;
-  nextEnable = !0;
+  diseaseIsSpreading = false;
+  backEnable = false;
+  nextEnable = true;
   resetBack();
   resetNext();
   guideRailsPosition = 18;
@@ -1305,10 +1305,10 @@ function restoreNetworkLesson() {
     graph.links.push(tailoredLinks[e]);
   }
   removeDuplicateEdges(graph);
-  quarantineMode = !1;
-  vaccinateMode = !1;
-  diseaseIsSpreading = !1;
-  timeToStop = !1;
+  quarantineMode = false;
+  vaccinateMode = false;
+  diseaseIsSpreading = false;
+  timeToStop = false;
   hideQuarantine();
   wipeOut();
   svg = d3.select("body").append("svg")
@@ -1404,24 +1404,24 @@ function restoreEpidemicLesson() {
 .attr("class", "menuItemNormal"),
   hideSyringe(),
   hideQuarantine(),
-  quarantineMode = !1, d3.select(".redX").remove(),
-  graph.nodes = [], graph.links = [], timestep = 0, diseaseIsSpreading = !1, timeToStop = !1, tailoredNodes.splice(13, 1);
+  quarantineMode = false, d3.select(".redX").remove(),
+  graph.nodes = [], graph.links = [], timestep = 0, diseaseIsSpreading = false, timeToStop = false, tailoredNodes.splice(13, 1);
   for (var e = 0; e < tailoredNodes.length; e++) tailoredNodes[e].status = "S", tailoredNodes[e].infectedBy = null, tailoredNodes[e].exposureTimestep = null, graph.nodes.push(tailoredNodes[e]);
   for (var t = 0; t < tailoredLinks.length; t++) graph.links.push(tailoredLinks[t]);
   removeDuplicateEdges(graph),
   tutorialUpdate(),
-  endGame = !1, startButton = d3.select(".guideTextSVG").append("text").attr("class", "startButton").attr("font-size", "18px").attr("opacity", 1).attr("x", nextX)
+  endGame = false, startButton = d3.select(".guideTextSVG").append("text").attr("class", "startButton").attr("font-size", "18px").attr("opacity", 1).attr("x", nextX)
 .attr("y", nextY)
 .style("cursor", "pointer")
 .style("font-family", "Nunito")
 .style("fill", "#707070")
 .style("font-weight", 470).text("Start >").on("click", function() {
     var e = Math.floor(Math.random() * numberOfIndividuals);
-    graph.nodes[e].status = "I", diseaseIsSpreading = !0, tutorialTimesteps(),
+    graph.nodes[e].status = "I", diseaseIsSpreading = true, tutorialTimesteps(),
   resetMenu(),
-  nextEnable = !1, backEnable = !1, disableNext(),
+  nextEnable = false, backEnable = false, disableNext(),
   disableBack(),
-  timeToStop = !1
+  timeToStop = false
   }),
   guideRailsPosition = 4, guideRails()
 }
@@ -1504,10 +1504,10 @@ function vax2QuarantineTransition() {
 function guideRails(e) {
   if (!diseaseIsSpreading) {
     if (
-      0 == guideRailsPosition && (backEnable = !1),
+      0 == guideRailsPosition && (backEnable = false),
       1 == guideRailsPosition && (
-        nextEnable = !0,
-        backEnable = !0,
+        nextEnable = true,
+        backEnable = true,
         resetBack(),
         resetNext(),
         e || addOneFriend(),
@@ -1525,8 +1525,8 @@ function guideRails(e) {
           .attr("opacity", 1)
       ),
       2 == guideRailsPosition && (
-        nextEnable = !0,
-        backEnable = !0,
+        nextEnable = true,
+        backEnable = true,
         resetBack(),
         resetNext(),
         e || buildGraph(),
@@ -1544,8 +1544,8 @@ function guideRails(e) {
           .attr("opacity", 1)
       ),
       3 == guideRailsPosition && (
-        nextEnable = !0,
-        backEnable = !0,
+        nextEnable = true,
+        backEnable = true,
         resetBack(),
         resetNext(),
         charge = -400,
@@ -1588,7 +1588,7 @@ function guideRails(e) {
               var e = Math.floor(Math.random() * numberOfIndividuals);
               graph.nodes[e].status = "I";
               removeDuplicateEdges(graph);
-              diseaseIsSpreading = !0;
+              diseaseIsSpreading = true;
               tutorialUpdate();
               slideOutMenuBox();
               tutorialTimesteps();
@@ -1598,18 +1598,18 @@ function guideRails(e) {
         ){
           var t = Math.floor(Math.random() * numberOfIndividuals);
           graph.nodes[t].status = "I", removeDuplicateEdges(graph),
-          diseaseIsSpreading = !0, tutorialUpdate(),
+          diseaseIsSpreading = true, tutorialUpdate(),
           tutorialTimesteps()
         }
         resetMenu(),
-        nextEnable = !1,
-        backEnable = !1,
+        nextEnable = false,
+        backEnable = false,
         disableNext(),
         disableBack(),
-        timeToStop = !1
+        timeToStop = false
       }
   if (5 == guideRailsPosition) {
-    nextEnable = !0, backEnable = !0, resetBack(),
+    nextEnable = true, backEnable = true, resetBack(),
     resetNext();
     var i = svg.selectAll("image").data([0]);
     i.enter().append("image")
@@ -1644,7 +1644,7 @@ function guideRails(e) {
     })
   }
     if (6 == guideRailsPosition) {
-      nextEnable = !0, backEnable = !0, resetBack(),
+      nextEnable = true, backEnable = true, resetBack(),
   resetNext(),
   d3.select(".redX").remove();
       for (var a = 0; a < graph.nodes.length; a++) graph.nodes.status = "S";
@@ -1661,7 +1661,7 @@ function guideRails(e) {
   d3.select(".guide2").transition().duration(500)
 .attr("opacity", 1)
     }
-    if (7 == guideRailsPosition && (nextEnable = !0, backEnable = !0, resetBack(),
+    if (7 == guideRailsPosition && (nextEnable = true, backEnable = true, resetBack(),
   resetNext(),
   d3.selectAll("circle.node").transition().duration(500)
 .attr("r", function(e) {
@@ -1678,7 +1678,7 @@ function guideRails(e) {
 .attr("opacity", 1),
   d3.select(".guide2").transition().duration(500)
 .attr("opacity", 1)),
-  8 == guideRailsPosition && (nextEnable = !0, backEnable = !0, resetBack(),
+  8 == guideRailsPosition && (nextEnable = true, backEnable = true, resetBack(),
   resetNext(),
   d3.select(".guide").attr("x", guideXCoord).attr("y", guideYCoord)
 .attr("opacity", 0).text("Most of the time, focusing treatment on people with"),
@@ -1692,7 +1692,7 @@ function guideRails(e) {
 .attr("opacity", 1),
   d3.select(".nextArrow").on("click", epi2VaxTransition)),
   9 == guideRailsPosition) {
-      graph.nodes = [], nextEnable = !1, backEnable = !1, resetBack(),
+      graph.nodes = [], nextEnable = false, backEnable = false, resetBack(),
   resetNext(),
   vaccineSupply = 1, vax = 1, numberVaccinated = 0, loadSyringe(),
   d3.select(".lessonText").text("Lesson 3: Vaccines"),
@@ -1723,9 +1723,9 @@ function guideRails(e) {
       removeDuplicateEdges(graph),
   tutorialUpdate()
     }
-    if (10 == guideRailsPosition && (nextEnable = !0, backEnable = !1, resetNext(),
+    if (10 == guideRailsPosition && (nextEnable = true, backEnable = false, resetNext(),
   resetBack(),
-  keepFlashing = !1, d3.select(".guide").attr("x", guideXCoord).attr("y", guideYCoord)
+  keepFlashing = false, d3.select(".guide").attr("x", guideXCoord).attr("y", guideYCoord)
 .attr("opacity", 0).text("When we vaccinate a node,"),
   d3.select(".guide2").attr("x", guideXCoord).attr("y", guideYCoord + guide2YCoordChange)
 .attr("opacity", 0).text("it is removed because it cannot be infected."),
@@ -1739,11 +1739,11 @@ function guideRails(e) {
   11 == guideRailsPosition) {
       weakTieNodes = getWeakTieNodes(),
   weakTieLinks = getWeakTieLinks(),
-  nextEnable = !1, backEnable = !1, d3.select(".nextArrow")
+  nextEnable = false, backEnable = false, d3.select(".nextArrow")
 .attr("fill", "#838383").on("click", function() {}),
   d3.select(".nextArrow")
 .attr("fill", "#838383").on("click", function() {}),
-  keepFlashing = !0, loadSyringe(),
+  keepFlashing = true, loadSyringe(),
   vaccineSupply = 1, numberVaccinated = 0, charge = -300, d3.select(".guide").attr("x", guideXCoord).attr("y", guideYCoord)
 .attr("opacity", 0).text("Separate this network into two groups"),
   d3.select(".guide2").attr("x", guideXCoord).attr("y", guideYCoord + guide2YCoordChange)
@@ -1768,7 +1768,7 @@ function guideRails(e) {
   tutorialUpdate(),
   flashNodes()
     }
-    if (12 == guideRailsPosition && (vaccinateMode = !1, d3.selectAll(".node")
+    if (12 == guideRailsPosition && (vaccinateMode = false, d3.selectAll(".node")
 .attr("r", 8)
 .style("fill", "#b7b7b7"),
   d3.select(".guide").attr("x", guideXCoord).attr("y", guideYCoord)
@@ -1785,7 +1785,7 @@ function guideRails(e) {
 .style("fill", "#b7b7b7")),
   13 == guideRailsPosition) {
       hideSyringe(),
-  vaccinateMode = !1, timeToStop = !0, d3.select(".vaccineDepressedState")
+  vaccinateMode = false, timeToStop = true, d3.select(".vaccineDepressedState")
 .style("visibility", "hidden"),
   graph.nodes = [], graph.links = [], tailoredNodes.splice(13, 1);
       for (var a = 0; a < tailoredNodes.length; a++) graph.nodes.push(tailoredNodes[a]),
@@ -1816,14 +1816,14 @@ function guideRails(e) {
 .attr("opacity", 1),
   d3.select(".guide2").transition().duration(500)
 .attr("opacity", 1),
-  vaccinateMode = !1
+  vaccinateMode = false
     }
-    if (14 == guideRailsPosition && (nextEnable = !1, backEnable = !0, resetBack(),
+    if (14 == guideRailsPosition && (nextEnable = false, backEnable = true, resetBack(),
   resetNext(),
-  timeToStop = !0, vaccineSupply = 3, vax = 3, wiggle = !0, loadSyringe(),
+  timeToStop = true, vaccineSupply = 3, vax = 3, wiggle = true, loadSyringe(),
   d3.select(".guide").attr("x", guideXCoord).attr("y", guideYCoord)
 .attr("opacity", 0).text("Select the 'Vaccinate' tool in the upper right and select"),
-  vaccineSupply = 3, diseaseIsSpreading = !1, postInitialOutbreak = !0, d3.select(".guide2").attr("x", guideXCoord).attr("y", guideYCoord + guide2YCoordChange)
+  vaccineSupply = 3, diseaseIsSpreading = false, postInitialOutbreak = true, d3.select(".guide2").attr("x", guideXCoord).attr("y", guideYCoord + guide2YCoordChange)
 .attr("opacity", 0).text("nodes to vaccinate. You only get " + vaccineSupply + " vaccines, so choose wisely."),
   centerElement(guide, "guide"),
   centerElement(guide2, "guide2"),
@@ -1831,7 +1831,7 @@ function guideRails(e) {
 .attr("opacity", 1),
   d3.select(".guide2").transition().duration(500)
 .attr("opacity", 1)),
-  15 == guideRailsPosition && (nextEnable = !0, resetNext(),
+  15 == guideRailsPosition && (nextEnable = true, resetNext(),
   d3.select(".guide").attr("x", guideXCoord).attr("y", guideYCoord)
 .attr("opacity", 0).text("When you vaccinate a node, they are effectively removed from"),
   d3.select(".guide2").attr("x", guideXCoord).attr("y", guideYCoord + guide2YCoordChange)
@@ -1842,7 +1842,7 @@ function guideRails(e) {
 .attr("opacity", 1),
   d3.select(".guide2").transition().duration(500)
 .attr("opacity", 1)),
-  16 == guideRailsPosition && (nextEnable = !0, resetNext(),
+  16 == guideRailsPosition && (nextEnable = true, resetNext(),
   d3.select(".guide").attr("x", guideXCoord).attr("y", guideYCoord)
 .attr("opacity", 0).text("Vaccinating breaks the network into smaller pieces"),
   d3.select(".guide2").attr("x", guideXCoord).attr("y", guideYCoord + guide2YCoordChange)
@@ -1854,7 +1854,7 @@ function guideRails(e) {
   d3.select(".guide2").transition().duration(500)
 .attr("opacity", 1)),
   17 == guideRailsPosition) {
-      nextEnable = !1, backEnable = !1, resetNext(),
+      nextEnable = false, backEnable = false, resetNext(),
   resetBack(),
   d3.select(".guide").attr("x", guideXCoord).attr("y", guideYCoord)
     .attr("opacity", 0).text("Now, when an infection spreads, it is more likely"),
@@ -1869,14 +1869,14 @@ function guideRails(e) {
   var u = graph.nodes.length;
   do var c = Math.floor(Math.random() * u),
     g = graph.nodes[c]; while ("V" == g.status);
-  g.status = "I", diseaseIsSpreading = !0,
+  g.status = "I", diseaseIsSpreading = true,
   resetMenu(),
-  timestep = 0, timeToStop = !1, postInitialOutbreak = !1, finalStop = !0, tutorialTimesteps(),
+  timestep = 0, timeToStop = false, postInitialOutbreak = false, finalStop = true, tutorialTimesteps(),
   tutorialUpdate()
   }
   if (
     18 == guideRailsPosition && (
-      finalStop = !1,
+      finalStop = false,
       d3.select(".guide").attr("x", guideXCoord).attr("y", guideYCoord)
         .attr("opacity", 0).text("In lesson 4: quarantine, we'll consider actions that"),
       d3.select(".guide2").attr("x", guideXCoord).attr("y", guideYCoord + guide2YCoordChange)
@@ -1905,12 +1905,12 @@ function guideRails(e) {
       d3.select(".guide2").transition().duration(500)
         .attr("opacity", 1)),
     20 == guideRailsPosition && (
-      nextEnable = !1,
-      backEnable = !1,
+      nextEnable = false,
+      backEnable = false,
       resetNext(),
       resetBack(),
       transmissionRate = .35,
-      rerun = !1,
+      rerun = false,
       hideSyringe(),
       loadQuarantine(),
       d3.select(".guide")
@@ -1930,7 +1930,7 @@ function guideRails(e) {
       d3.select(".guide2").transition().duration(500)
         .attr("opacity", 1)),
     21 == guideRailsPosition && (
-      nextEnable = !0,
+      nextEnable = true,
       resetNext(),
       d3.select(".guide")
         .attr("x", guideXCoord)
@@ -1989,19 +1989,19 @@ function flashFullGame() {
   menuColorFlash = !menuColorFlash
 }
 
-var menuColorFlash = !0,
+var menuColorFlash = true,
   colorIndex = 0,
   menuColors = ["#007138", "#ffffff"],
-  wiggle = !1;
+  wiggle = false;
   function guideRailsReverse() {
-    var e = !0;
+    var e = true;
     if (0 == guideRailsPosition && (
       trivialGraph = {},
       trivialGraph.nodes = [],
       trivialGraph.links = [],
       d3.selectAll(".node").remove(),
       d3.selectAll(".link").remove(),
-      quarantineMode = !1, diseaseIsSpreading = !1, timeToStop = !0, backEnable = !1, resetBack(),
+      quarantineMode = false, diseaseIsSpreading = false, timeToStop = true, backEnable = false, resetBack(),
       d3.select(".guide").attr("x", guideXCoord).attr("y", guideYCoord).attr("font-size", "28px")
         .attr("opacity", 0).text("Suppose this is you"),
       d3.select(".guide2").text(""),
@@ -2021,7 +2021,7 @@ var menuColorFlash = !0,
       trivialGraph.nodes.push(tailoredNodes[0]),
       stepWiseUpdate()
     ), 1 == guideRailsPosition) {
-      quarantineMode = !1,
+      quarantineMode = false,
       trivialGraph.nodes = [],
       trivialGraph.links = [],
       trivialGraph.nodes.push(tailoredNodes[0]),
@@ -2034,7 +2034,7 @@ var menuColorFlash = !0,
       stepWiseUpdate();
     }
     if (2 == guideRailsPosition) {
-      quarantineMode = !1,
+      quarantineMode = false,
       trivialGraph.nodes = [],
       trivialGraph.links = [],
       trivialGraph.nodes.push(tailoredNodes[0]),
@@ -2048,7 +2048,7 @@ var menuColorFlash = !0,
             var r = {
               source: trivialGraph.nodes[a],
               target: trivialGraph.nodes[s],
-              remove: !1
+              remove: false
             };
             if (testDuplicate(trivialGraph.links, r)) continue;
             trivialGraph.links.push(r);
@@ -2059,7 +2059,7 @@ var menuColorFlash = !0,
       }
     }
     if (3 == guideRailsPosition && (timestep = 0, guideRailsPosition++, guideRails()), 4 == guideRailsPosition) {
-      quarantineMode = !1, d3.select("#networkSxn")
+      quarantineMode = false, d3.select("#networkSxn")
         .attr("class", "menuItemNormal"),
       d3.select("#epidemicSxn")
         .attr("class", "menuItemBold"),
@@ -2071,8 +2071,8 @@ var menuColorFlash = !0,
       graph.nodes = [],
       graph.links = [],
       timestep = 0,
-      diseaseIsSpreading = !1,
-      timeToStop = !1;
+      diseaseIsSpreading = false,
+      timeToStop = false;
       for (var i = 0; i < tailoredNodes.length; i++){
         tailoredNodes[i].status = "S";
         tailoredNodes[i].infectedBy = null;
@@ -2086,7 +2086,7 @@ var menuColorFlash = !0,
     }
     if (9 == guideRailsPosition) {
       force.stop(),
-      quarantineMode = !1
+      quarantineMode = false
       hideQuarantine(),
       graph.nodes = [],
       graph.links = [];
@@ -2102,14 +2102,14 @@ var menuColorFlash = !0,
       d3.selectAll(".node").transition().duration(500)
         .attr("r", e => "S" == e.status ? 8 : "V" == e.status ? 15 : void 0)
         .style("fill", e => "S" == e.status ? "#b7b7b7" : "V" == e.status ? "#d9d678" : void 0);
-      keepFlashing = !0;
+      keepFlashing = true;
     }
     if (guideRailsPosition >= 13 && 17 >= guideRailsPosition) {
-      backEnable = !0,
-      nextEnable = !0,
+      backEnable = true,
+      nextEnable = true,
       resetBack(),
       resetNext(),
-      quarantineMode = !1,
+      quarantineMode = false,
       guideRailsPosition = 13,
       vaccineSupply = 3,
       vax = 3,
@@ -2117,16 +2117,16 @@ var menuColorFlash = !0,
       graph.links = [];
       for (var i = 0; i < tailoredNodes.length; i++){
         tailoredNodes[i].status = "S";
-        tailoredNodes[i].fixed = !1;
+        tailoredNodes[i].fixed = false;
         graph.nodes.push(tailoredNodes[i]);
       }
       for (var a = 0; a < tailoredLinks.length; a++) graph.links.push(tailoredLinks[a]);
       removeDuplicateEdges(graph);
       tutorialUpdate();
-      timeToStop = !1;
-      diseaseIsSpreading = !1;
-      finalStop = !0;
-      endGame = !1;
+      timeToStop = false;
+      diseaseIsSpreading = false;
+      finalStop = true;
+      endGame = false;
     }
     guideRails(e);
   }

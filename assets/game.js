@@ -35,8 +35,8 @@ var numberOfIndividuals,
   newInfections = [],
   exposureEdges = [],
   xyCoords = [],
-  diseaseIsSpreading = !1,
-  timeToStop = !1,
+  diseaseIsSpreading = false,
+  timeToStop = false,
   infectedBar,
   uninfectedBar,
   infectedHeight,
@@ -89,8 +89,8 @@ var numberOfIndividuals,
   customVaccineChoice = 1,
   customNeighborChocie = 1,
   customOutbreakChoice = 1;
-var speed = !1,
-  toggleDegree = !0;
+var speed = false,
+  toggleDegree = true;
 
 function initCookiesJSON() {
   var e = Cookies.get("vaxEasyCompletion");
@@ -101,7 +101,7 @@ function initCookiesJSON() {
   Cookies.set("customVaccines",  10);
   Cookies.set("customOutbreaks",  2);
   Cookies.set("customRefusers",  .05);
-  Cookies.set("json", !0);
+  Cookies.set("json", true);
   easyScores = [];
   mediumScores = [];
   hardScores = [];
@@ -111,9 +111,9 @@ function initCookiesJSON() {
   hardScoresRT = [];
   var o = [easyScoresRT, mediumScoresRT, hardScoresRT],
       s = {
-        easy: !1,
-        medium: !1,
-        hard: !1,
+        easy: false,
+        medium: false,
+        hard: false,
         scores: t,
         scoresRT: o
       };
@@ -124,18 +124,19 @@ function initCookiesJSON() {
 }
 
 function readCookiesJSON() {
-  Cookies.set("json", !0);
+  Cookies.set("json", true);
   var e = Cookies.getJSON("vaxCookie");
   if (
-    void 0 == e && initCookiesJSON(),
-    cookie = Cookies.getJSON("vaxCookie"),
-    vaxEasyCompletion = cookie.easy,
-    vaxMediumCompletion = cookie.medium,
-    vaxHardCompletion = cookie.hard,
-    vaxEasyHiScore = Math.max.apply(Math, cookie.scores[0]),
-    vaxMediumHiScore = Math.max.apply(Math, cookie.scores[1]),
-    vaxHardHiScore = Math.max.apply(Math, cookie.scores[2]),
-    void 0 == cookie.scoresRT
+    void 0 == e &&
+      initCookiesJSON(),
+      cookie = JSON.parse(Cookies.get("vaxCookie")),
+      vaxEasyCompletion = cookie.easy,
+      vaxMediumCompletion = cookie.medium,
+      vaxHardCompletion = cookie.hard,
+      vaxEasyHiScore = Math.max.apply(Math, cookie.scores[0]),
+      vaxMediumHiScore = Math.max.apply(Math, cookie.scores[1]),
+      vaxHardHiScore = Math.max.apply(Math, cookie.scores[2]),
+      void 0 == cookie.scoresRT
   ) {
     var t = [],
       i = [],
@@ -146,7 +147,7 @@ function readCookiesJSON() {
   vaxEasyHiScoreRT = Math.max.apply(Math, cookie.scoresRT[0]),
   vaxMediumHiScoreRT = Math.max.apply(Math, cookie.scoresRT[1]),
   vaxHardHiScoreRT = Math.max.apply(Math, cookie.scoresRT[2]),
-  Cookies.set("json", !1),
+  Cookies.set("json", false),
   customNodeChoice = parseInt(Cookies.get("customNodes")), 
   customNeighborChoice = parseInt(Cookies.get("customNeighbors")),
   customVaccineChoice = parseInt(Cookies.get("customVaccines")),
@@ -157,7 +158,7 @@ function readCookiesJSON() {
   isNaN(customVaccineChoice) && (customVaccineChoice = 10, Cookies.set("customVaccines",  10)),
   isNaN(customOutbreakChoice) && (customOutbreakChoice = 2, Cookies.set("customOutbreaks",  2)),
   isNaN(customRefuserChoice) && (customRefuserChoice = .05, Cookies.set("customRefusers",  .05)),
-  Cookies.set("json", !0),
+  Cookies.set("json", true),
   cookieBasedModeSelection()
 }
 
@@ -177,7 +178,7 @@ function clearCookies() {
 }
 
 function allAccess() {
-  Cookies.set("json", !0),
+  Cookies.set("json", true),
   easyScores = ["99"],
   mediumScores = ["99"],
   hardScores = ["99"];
@@ -187,9 +188,9 @@ function allAccess() {
   hardScoresRT = ["99"];
   var t = [easyScoresRT, mediumScoresRT, hardScoresRT],
     i = {
-      easy: !0,
-      medium: !0,
-      hard: !0,
+      easy: true,
+      medium: true,
+      hard: true,
       scores: e,
       scoresRT: t
     };
@@ -221,42 +222,6 @@ function cookieBasedModeSelection() {
         difficultyString = "hard";
         initBasicGame(difficultyString);  
       }
-    });
-}
-
-function initFooter() {
-  d3.select("#helpNav").remove();
-
-  d3.select("#newGameNav").remove();
-
-  d3.select("body")
-    .append("div")
-    .attr("class", "gameMenuBox");
-
-  d3.select(".gameMenuBox")
-    .append("div")
-    .attr("class", "gameMenuBoxItem")
-    .attr("id", "helpNav")
-    .text("FAQ")
-    .on("click", () => window.location.href = "/faq.html")
-    .on("mouseover", function() {
-      d3.select(this).style("color", "#2692F2")
-    })
-    .on("mouseout", function() {
-      d3.select(this).style("color", "white")
-    });
-
-  d3.select(".gameMenuBox")
-    .append("div")
-    .attr("class", "gameMenuBoxItem")
-    .attr("id", "newGameNav")
-    .text("New Game")
-    .on("click", () => window.location.href = "/game.html")
-    .on("mouseover", function() {
-      d3.select(this).style("color", "#2692F2")
-    })
-    .on("mouseout", function() {
-      d3.select(this).style("color", "white")
     });
 }
 
@@ -293,9 +258,14 @@ function initBasicGame(e) {
     independentOutbreaks = 3
   ),
   graph = generateSmallWorld(numberOfIndividuals, rewire, meanDegree);
-  for (var t = 0; t < graph.nodes.length; t++) graph.nodes[t].fixed = !1;
-  if ("hard" == e)
-    for (var t = 0; t < graph.nodes.length; t++) Math.random() < .05 && (graph.nodes[t].refuser = !0);
+  for (var t = 0; t < graph.nodes.length; t++){
+    graph.nodes[t].fixed = false;
+  }
+  if ("hard" == e){
+    for (var t = 0; t < graph.nodes.length; t++){
+      Math.random() < .05 && (graph.nodes[t].refuser = true);
+    }
+  }
   removeDuplicateEdges(graph);
   initGameSpace();
 }
@@ -322,49 +292,40 @@ function initCustomGame() {
   customNodeChoice > 125 && (charge = -130),
   graph = generateSmallWorld(numberOfIndividuals, rewire, meanDegree),
   removeDuplicateEdges(graph);
-  for (var e = 0; e < graph.nodes.length; e++) graph.nodes[e].refuser = !1;
+  for (var e = 0; e < graph.nodes.length; e++) graph.nodes[e].refuser = false;
   for (var e = 0; numberOfRefusers > e; e++) {
     do var t = graph.nodes[Math.floor(Math.random() * graph.nodes.length)]; while (t.refuser);
-    t.refuser = !0
+    t.refuser = true
   }
   for (var i = 0, e = 0; e < graph.nodes.length; e++) graph.nodes[e].refuser && i++;
-  i == numberOfIndividuals && (numberOfVaccines = 1, graph.nodes[0].refuser = !1),
+  i == numberOfIndividuals && (numberOfVaccines = 1, graph.nodes[0].refuser = false),
   d3.select("#customMenuDiv")
     .style("right", "-1000px")
-    .style("visibility", "hidden"),
+    .style("visibility", "hidden");
   window.setTimeout(function() {
-    d3.select("#customMenuDiv").remove(), initGameSpace()
-  }, 500)
+    d3.select("#customMenuDiv").remove();
+    initGameSpace();
+  }, 500);
 }
 
 function initGameSpace() {
   pop = document.getElementById("audio"),
-  game = !0,
+  game = true,
   loadGameSyringe(),
-  initFooter(),
-  window.setTimeout(function() {
-    d3.select(".gameMenuBox").style("right", "-10px")
-  }, 1);
-  vaccinateMode = !1,
-  quarantineMode = !1,
+  vaccinateMode = false,
+  quarantineMode = false,
   numberVaccinated = 0,
   numberQuarantined = 0;
   var e = "undefined" != typeof InstallTrigger,
-    t = !1 || document.documentMode;
+    t = false || document.documentMode;
   gameSVG = e || t ?
+    d3.select("body").append("svg").append("svg:g") :
     d3.select("body").append("svg")
-      .attr("width", 950)
-      .attr("height", 723)
-      .attr("class", "gameSVG")
-      .attr("pointer-events", "all")
-      .append("svg:g") :
-    d3.select("body").append("svg")
-      .attr("width", "75%")
-      .attr("height", "80.5%")
+      .attr("width", width)
+      .attr("height", height)
       .attr("viewBox", "0 0 " + width + " " + height)
       .attr("class", "gameSVG")
       .attr("pointer-events", "all")
-      .style("margin-left", 135)
       .append("svg:g"),
     force = d3.layout.force()
       .nodes(graph.nodes)
@@ -408,7 +369,7 @@ function initGameSpace() {
         newLocation = [],
         originalLocation[0] = e.x, 
         originalLocation[1] = e.y,
-        e.fixed = !0
+        e.fixed = true
       }).on("drag", function(e) {
         e.px += d3.event.dx,
         e.py += d3.event.dy,
@@ -421,11 +382,14 @@ function initGameSpace() {
         dragEndDateObject = new Date,
         dragEndMillis = dragEndDateObject.getMilliseconds(),
         clickTime = Math.abs(dragEndMillis - dragStartMillis),
-        console.log(clickTime + "	" + getCartesianDistance(originalLocation, newLocation)),
-        e.fixed = !1,
+        e.fixed = false,
         tick(),
         force.resume(),
-        getCartesianDistance(originalLocation, newLocation) < dragDistanceThreshold ? clickTimeThreshold > clickTime && (speed ? speedModeGameClick(e) : gameClick(e)) : clickTimeThreshold > clickTime && (speed ? speedModeGameClick(e) : gameClick(e))
+        getCartesianDistance(originalLocation, newLocation) < dragDistanceThreshold ? clickTimeThreshold > clickTime && (
+          speed ? speedModeGameClick(e) : gameClick(e)
+        ) : clickTimeThreshold > clickTime && (
+          speed ? speedModeGameClick(e) : gameClick(e)
+        )
       })),
       node = gameSVG.selectAll(".node")
         .data(graph.nodes)
@@ -460,7 +424,7 @@ function initGameSpace() {
             newLocation = [],
             originalLocation[0] = e.x,
             originalLocation[1] = e.y,
-            e.fixed = !0
+            e.fixed = true
           })
           .on("drag", function(e) {
             e.px += d3.event.dx,
@@ -475,14 +439,12 @@ function initGameSpace() {
             dragEndDateObject = new Date,
             dragEndMillis = dragEndDateObject.getMilliseconds(),
             clickTime = Math.abs(dragEndMillis - dragStartMillis),
-            console.log(clickTime + "	" + getCartesianDistance(originalLocation, newLocation)),
-            e.fixed = !1,
+            e.fixed = false,
             tick(),
             force.resume(),
             getCartesianDistance(originalLocation, newLocation) < dragDistanceThreshold ? clickTimeThreshold > clickTime && (speed ? speedModeGameClick(e) : gameClick(e)) : clickTimeThreshold > clickTime && (speed ? speedModeGameClick(e) : gameClick(e))
           })
-        ),
-      loadHotKeyText();
+        );
       if(difficultyString == "hard" || difficultyString == null){
         refusersPresent();
       }
@@ -494,7 +456,7 @@ function initGameSpace() {
 }
 
 function loadHotKeyText() {
-  var e = !0;
+  var e = true;
   d3.select("body").append("div")
     .attr("id", "pinNodesDiv"),
   d3.select("#pinNodesDiv").append("text")
@@ -555,7 +517,7 @@ function gameClick(e) {
     try {
       pop.play()
     } catch (t) {}
-    diseaseIsSpreading = !0, e.status = "Q", numberQuarantined++, window.setTimeout(gameTimesteps, 500)
+    diseaseIsSpreading = true, e.status = "Q", numberQuarantined++, window.setTimeout(gameTimesteps, 500)
   }
   0 != numberOfVaccines || diseaseIsSpreading || loadGameQuarantine(), gameUpdate()
 }
@@ -572,7 +534,7 @@ function speedModeGameClick(e) {
     try {
       pop.play()
     } catch (t) {}
-    diseaseIsSpreading = !0, e.status = "Q", numberQuarantined++
+    diseaseIsSpreading = true, e.status = "Q", numberQuarantined++
   }
   0 != numberOfVaccines || diseaseIsSpreading || loadGameQuarantine(), gameUpdate()
 }
@@ -614,34 +576,41 @@ function gameUpdate() {
   link = gameSVG.selectAll("line.link").data(t, function(e) {
     return e.source.id + "-" + e.target.id
   }),
-  link.enter().insert("svg:line", ".node").attr("class", "link").attr("x1", function(e) {
-    return e.source.x
-  }).attr("y1", function(e) {
-    return e.source.y
-  }).attr("x2", function(e) {
-    return e.target.x
-  }).attr("y2", function(e) {
-    return e.target.y
-  }),
+  link.enter().insert("svg:line", ".node")
+    .attr("class", "link")
+    .attr("x1", function(e) {
+      return e.source.x
+    }).attr("y1", function(e) {
+      return e.source.y
+    }).attr("x2", function(e) {
+      return e.target.x
+    }).attr("y2", function(e) {
+      return e.target.y
+    }),
   link.exit().remove(),
-  node = gameSVG.selectAll("circle.node").data(e, function(e) {
-    return e.id
-  }).style("fill", nodeColor),
+  node = gameSVG.selectAll("circle.node").data(e, e => e.id).style("fill", nodeColor),
   d3.selectAll(".node").transition().duration(100).attr("r", nodeSize),
-  d3.selectAll(".clickArea").attr("fill", "black").attr("opacity", 0).on("click", function(e) {
-    "V" != e.status && "Q" != e.status && (speed ? speedModeGameClick(e) : gameClick(e))
-  }).attr("r", function(e) {
-    var t;
-    return findNeighbors(e).length <= 1 ? t = 0 : ("easy" == difficultyString && (t = 1.9 * nodeSize(e)), "medium" == difficultyString && (t = (invisibleParameter - .2) * nodeSize(e)), "hard" == difficultyString && (t = (invisibleParameter - .3) * nodeSize(e))), t
-  }),
-  node.enter().append("svg:circle").attr("class", "node").attr("cx", function(e) {
-    return e.x
-  }).attr("cy", function(e) {
-    return e.y
-  }).style("fill", nodeColor).on("click", function(e) {
-    speed ? speedModeGameClick(e) : gameClick(e)
-  }).call(force.drag),
-  node.exit().remove()
+  d3.selectAll(".clickArea")
+    .attr("fill", "black")
+    .attr("opacity", 0).on("click", function(e) {
+      "V" != e.status && "Q" != e.status && (speed ? speedModeGameClick(e) : gameClick(e))
+    })
+    .attr("r", function(e) {
+      var t;
+      return findNeighbors(e).length <= 1 ? t = 0 : (
+        "easy" == difficultyString && (t = 1.9 * nodeSize(e)),
+        "medium" == difficultyString && (t = (invisibleParameter - .2) * nodeSize(e)),
+        "hard" == difficultyString && (t = (invisibleParameter - .3) * nodeSize(e))
+      ), t
+    }),
+  node.enter().append("svg:circle")
+    .attr("class", "node")
+    .attr("cx", e => e.x)
+    .attr("cy", e => e.y)
+    .style("fill", nodeColor)
+    .on("click", e => speed ? speedModeGameClick(e) : gameClick(e))
+    .call(force.drag);
+  node.exit().remove();
 }
 
 function gameTimesteps() {
@@ -655,7 +624,16 @@ function gameTimesteps() {
 }
 
 function speedModeTimesteps() {
-  infection(), stateChanges(), newInfections = [], newInfections = updateExposures(), timestep++, detectGameCompletion(), timeToStop ? animateGamePathogens_thenUpdate() : (animateGamePathogens_thenUpdate(), window.setTimeout(speedModeTimesteps, 1750))
+  infection(),
+  stateChanges(),
+  newInfections = [],
+  newInfections = updateExposures(), 
+  timestep++,
+  detectGameCompletion(),
+  timeToStop ? animateGamePathogens_thenUpdate() : (
+    animateGamePathogens_thenUpdate(),
+    window.setTimeout(speedModeTimesteps, 1750)
+  );
 }
 
 function detectGameCompletion() {
@@ -668,35 +646,48 @@ function detectGameCompletion() {
       }
       a > 0 && i > 0 && e++
     }
-    0 == e && diseaseIsSpreading && (diseaseIsSpreading = !1, timeToStop = !0, animateGamePathogens_thenUpdate(), window.setTimeout(endGameSession, 1e3))
+    0 == e && diseaseIsSpreading && (
+      diseaseIsSpreading = false,
+      timeToStop = true,
+      animateGamePathogens_thenUpdate(),
+      window.setTimeout(endGameSession, 1e3)
+    )
   }
 }
 
 function animateGamePathogens_thenUpdate() {
-  window.setTimeout(createGamePathogens, 50), window.setTimeout(moveGamePathogens, 100), window.setTimeout(popNewGameInfection, 300), window.setTimeout(removeGamePathogens, 800), window.setTimeout(gameUpdate, 850)
+  window.setTimeout(createGamePathogens, 50),
+  window.setTimeout(moveGamePathogens, 100),
+  window.setTimeout(popNewGameInfection, 300),
+  window.setTimeout(removeGamePathogens, 800),
+  window.setTimeout(gameUpdate, 850);
 }
 
 function popNewGameInfection() {
-  d3.selectAll(".node").transition().duration(500).attr("r", function(e) {
-    var t;
-    return t = toggleDegree ? (findNeighbors(e).length + 1.5) * resizingParameter : 8, "I" == e.status ? 1 == timestep - e.exposureTimestep ? 1.5 * t : t : t
-  })
+  d3.selectAll(".node").transition().duration(500)
+    .attr("r", function(e) {
+      var t;
+      return t = toggleDegree ? (findNeighbors(e).length + 1.5) * resizingParameter : 8,
+        "I" == e.status ? 1 == timestep - e.exposureTimestep ? 1.5 * t : t : t
+    });
 }
 
 function moveGamePathogens() {
-  d3.selectAll(".pathogen").sort().transition().duration(600).attr("cx", function(e) {
-    return e.receiverX
-  }).attr("cy", function(e) {
-    return e.receiverY
-  })
+  d3.selectAll(".pathogen").sort()
+    .transition().duration(600)
+    .attr("cx", e => e.receiverX)
+    .attr("cy", e => e.receiverY);
 }
 
 function createGamePathogens() {
-  xyCoords = getPathogen_xyCoords(newInfections), gameSVG.selectAll(".pathogen").data(xyCoords).enter().append("circle").attr("class", "pathogen").attr("cx", function(e) {
-    return e.transmitterX
-  }).attr("cy", function(e) {
-    return e.transmitterY
-  }).attr("r", 4).style("fill", "black")
+  xyCoords = getPathogen_xyCoords(newInfections),
+  gameSVG.selectAll(".pathogen").data(xyCoords)
+    .enter().append("circle")
+    .attr("class", "pathogen")
+    .attr("cx", e => e.transmitterX)
+    .attr("cy", e => e.transmitterY)
+    .attr("r", 4)
+    .style("fill", "black")
 }
 
 function getPathogen_xyCoords(e) {
@@ -715,72 +706,225 @@ function getPathogen_xyCoords(e) {
 }
 
 function removeGamePathogens() {
-  d3.selectAll(".node").transition().duration(200).attr("r", 8), d3.selectAll(".pathogen").transition().duration(200).style("opacity", 0), d3.selectAll(".pathogen").remove()
+  d3.selectAll(".node").transition().duration(200).attr("r", 8);
+  d3.selectAll(".pathogen").transition().duration(200).style("opacity", 0);
+  d3.selectAll(".pathogen").remove();
 }
 
 function gameIndexPatients() {
-  quarantineMode = !0;
+  quarantineMode = true;
   for (var e = 0; independentOutbreaks > 0;) {
     do e = Math.floor(Math.random() * graph.nodes.length); while ("S" != graph.nodes[e].status);
-    graph.nodes[e].status = "I", graph.nodes[e].infectedBy = "indexPatient", graph.nodes[e].exposureTimestep = 0, independentOutbreaks--
+    graph.nodes[e].status = "I",
+    graph.nodes[e].infectedBy = "indexPatient",
+    graph.nodes[e].exposureTimestep = 0, independentOutbreaks--
   }
   gameUpdate()
 }
 
 function loadGameSyringe() {
-  d3.select(".actionVax").style("visibility", "visible"), d3.select(".actionVax").style("right", 0), d3.select("#vaxShieldText").style("color", "white"), d3.select(".actionVax").append("text").attr("class", "vaccineCounterText").style("font-size", "16px").style("font-family", "Nunito").style("font-weight", 300).style("color", "white").text("").style("right", function() {
-    return 1 == numberOfVaccines.toString().length ? "49px" : 2 == numberOfVaccines.toString().length ? "46px" : void 0
-  }), d3.select(".vaccineCounterText").text(numberOfVaccines), window.setTimeout(activateGameVaccinationMode, 100)
+  d3.select(".actionVax").style("visibility", "visible"),
+  d3.select(".actionVax").style("right", 0),
+  d3.select("#vaxShieldText").style("color", "white"),
+  d3.select(".actionVax").append("text")
+    .attr("class", "vaccineCounterText")
+    .style("font-size", "16px")
+    .style("font-family", "Nunito")
+    .style("font-weight", 300)
+    .style("color", "white")
+    .text("")
+    .style("right", function() {
+      return 1 == numberOfVaccines.toString().length ? "49px" :
+             2 == numberOfVaccines.toString().length ? "46px" :
+             void 0;
+    }),
+  d3.select(".vaccineCounterText").text(numberOfVaccines),
+  window.setTimeout(activateGameVaccinationMode, 100)
 }
 
 function hideGameSyringe() {
-  vaccinationMode = !1, d3.select(".actionVax").style("right", "-200px"), d3.select(".gameSVG").style("cursor", "pointer"), d3.selectAll(".node").style("cursor", "pointer"), d3.select(".vaccineDepressedState").style("visibility", "hidden")
+  vaccinationMode = false,
+  d3.select(".actionVax").style("right", "-200px"),
+  d3.select("svg").style("cursor", "pointer"),
+  d3.selectAll(".node").style("cursor", "pointer"),
+  d3.select(".vaccineDepressedState").style("visibility", "hidden")
 }
 
 function loadGameQuarantine() {
-  vaccinateMode && hideGameSyringe(), vaccinateMode = !1, d3.select(".actionQuarantine").style("visibility", "visible"), d3.select(".actionQuarantine").style("right", "0px"), d3.select(".quarantineCounterText").remove(), d3.select("#quarantineText").style("color", "white"), d3.select(".actionQuarantine").append("text").attr("class", "quarantineCounterText").style("font-size", "16px").style("font-family", "Nunito").style("font-weight", 300).style("color", "white").text(""), d3.select(".quarantineCounterText").text("x" + numberQuarantined), window.setTimeout(activateGameQuarantineMode, 1e3)
+  vaccinateMode && hideGameSyringe();
+  vaccinateMode = false;
+  d3.select(".actionQuarantine").style("visibility", "visible");
+  d3.select(".actionQuarantine").style("right", "0px");
+  d3.select(".quarantineCounterText").remove();
+  d3.select("#quarantineText").style("color", "white");
+  d3.select(".actionQuarantine").append("text")
+    .attr("class", "quarantineCounterText")
+    .style("font-size", "16px")
+    .style("font-family", "Nunito")
+    .style("font-weight", 300)
+    .style("color", "white")
+    .text(""),
+  d3.select(".quarantineCounterText").text("x" + numberQuarantined);
+  window.setTimeout(activateGameQuarantineMode, 1e3);
 }
 
 function hideGameQuarantine() {
-  quarantineMode = !1, d3.select(".actionQuarantine").style("right", "-200px"), d3.select(".gameSVG").style("cursor", "pointer"), d3.selectAll(".node").style("cursor", "pointer"), d3.select(".quarantineDepressedState").style("visibility", "hidden")
+  quarantineMode = false,
+  d3.select(".actionQuarantine").style("right", "-200px"),
+  d3.select("svg").style("cursor", "pointer"),
+  d3.selectAll(".node").style("cursor", "pointer"),
+  d3.select(".quarantineDepressedState").style("visibility", "hidden");
 }
 
 function activateGameVaccinationMode() {
-  vaccinateMode = !0, d3.selectAll(".node").style("cursor", "url(/assets/vax_cursor.cur)"), d3.select(".gameSVG").style("cursor", "url(/assets/vax_cursor.cur)"), d3.select(".vaccineCounterText").text(numberOfVaccines), d3.select(".vaccineDepressedState").style("visibility", "visible")
+  vaccinateMode = true,
+  d3.selectAll(".node").style("cursor", "url(/assets/vax_cursor.cur)"),
+  d3.select("svg").style("cursor", "url(/assets/vax_cursor.cur)"),
+  d3.select(".vaccineCounterText").text(numberOfVaccines),
+  d3.select(".vaccineDepressedState").style("visibility", "visible")
 }
 
 function activateGameQuarantineMode() {
-  vaccinateMode = !1, quarantineMode = !0, d3.selectAll(".node").style("cursor", "url(/assets/vax_cursor.cur)"), d3.select(".gameSVG").style("cursor", "url(/assets/vax_cursor.cur)"), d3.select(".quarantineDepressedState").style("visibility", "visible"), gameIndexPatients(), outbreakDetected()
+  vaccinateMode = false,
+  quarantineMode = true,
+  d3.selectAll(".node").style("cursor", "url(/assets/vax_cursor.cur)"),
+  d3.select("svg").style("cursor", "url(/assets/vax_cursor.cur)"),
+  d3.select(".quarantineDepressedState").style("visibility", "visible"),
+  gameIndexPatients(),
+  outbreakDetected();
 }
 
 function refusersPresent() {
-  d3.select(".gameSVG").append("rect").attr("class", "refuserNotifyShadow").attr("x", window.innerWidth / 4 + 62 + 5 - 50).attr("y", -100).attr("width", 325).attr("height", 50).attr("fill", "#838383").attr("opacity", 1), d3.select(".gameSVG").append("rect").attr("class", "refuserNotifyBox").attr("x", window.innerWidth / 4 + 62 - 50).attr("y", -100).attr("width", 325).attr("height", 50).attr("fill", "#85bc99").attr("opacity", 1), d3.select(".gameSVG").append("text").attr("class", "refuserNotifyText").attr("x", window.innerWidth / 4 + 62 + 5 - 50 + 15).attr("y", -100).attr("fill", "white").style("font-family", "Nunito").style("font-size", "24px").style("font-weight", 300).text("Vaccine refusers present!").attr("opacity", 1), d3.select(".refuserNotifyText").transition().duration(500).attr("y", 232), d3.select(".refuserNotifyBox").transition().duration(500).attr("y", 200), d3.select(".refuserNotifyShadow").transition().duration(500).attr("y", 207), window.setTimeout(function() {
-    d3.select(".refuserNotifyShadow").transition().duration(500).attr("y", -100), d3.select(".refuserNotifyBox").transition().duration(500).attr("y", -100), d3.select(".refuserNotifyText").transition().duration(500).attr("y", -100)
+  d3.select("svg").append("rect")
+    .attr("class", "refuserNotifyShadow")
+    .attr("x", window.innerWidth / 4 + 62 + 5 - 50)
+    .attr("y", -100)
+    .attr("width", 325)
+    .attr("height", 50)
+    .attr("fill", "#838383")
+    .attr("opacity", 1),
+  d3.select("svg").append("rect")
+    .attr("class", "refuserNotifyBox")
+    .attr("x", window.innerWidth / 4 + 62 - 50)
+    .attr("y", -100)
+    .attr("width", 325)
+    .attr("height", 50)
+    .attr("fill", "#85bc99")
+    .attr("opacity", 1),
+  d3.select("svg").append("text")
+    .attr("class", "refuserNotifyText")
+    .attr("x", window.innerWidth / 4 + 62 + 5 - 50 + 15)
+    .attr("y", -100)
+    .attr("fill", "white")
+    .style("font-family", "Nunito")
+    .style("font-size", "24px")
+    .style("font-weight", 300)
+    .text("Vaccine refusers present!")
+    .attr("opacity", 1),
+  d3.select(".refuserNotifyText").transition().duration(500).attr("y", 232),
+  d3.select(".refuserNotifyBox").transition().duration(500).attr("y", 200),
+  d3.select(".refuserNotifyShadow").transition().duration(500).attr("y", 207),
+  window.setTimeout(function() {
+    d3.select(".refuserNotifyShadow").transition().duration(500).attr("y", -100),
+    d3.select(".refuserNotifyBox").transition().duration(500).attr("y", -100),
+    d3.select(".refuserNotifyText").transition().duration(500).attr("y", -100)
   }, 2500)
 }
 
 function outbreakDetected() {
-  d3.select(".gameSVG").append("rect").attr("class", "outbreakNotifyShadow").attr("x", window.innerWidth / 4 + 62 + 5 - 50).attr("y", -100).attr("width", 250).attr("height", 50).attr("fill", "#838383").attr("opacity", 1), d3.select(".gameSVG").append("rect").attr("class", "outbreakNotifyBox").attr("x", window.innerWidth / 4 + 62 - 50).attr("y", -100).attr("width", 250).attr("height", 50).attr("fill", "#85bc99").attr("opacity", 1), d3.select(".gameSVG").append("text").attr("class", "outbreakNotifyText").attr("x", window.innerWidth / 4 + 62 + 5 - 50 + 12).attr("y", -100).attr("fill", "white").style("font-family", "Nunito").style("font-size", "24px").style("font-weight", 300).text("Outbreak Detected!").attr("opacity", 1), d3.select(".outbreakNotifyText").transition().duration(500).attr("y", window.innerHeight / 2 - 300 + 100 - 70 + 5), d3.select(".outbreakNotifyBox").transition().duration(500).attr("y", window.innerHeight / 2 - 300), d3.select(".outbreakNotifyShadow").transition().duration(500).attr("y", window.innerHeight / 2 - 300 + 7), window.setTimeout(function() {
-    d3.select(".outbreakNotifyShadow").transition().duration(500).attr("y", -100), d3.select(".outbreakNotifyBox").transition().duration(500).attr("y", -100), d3.select(".outbreakNotifyText").transition().duration(500).attr("y", -100)
+  d3.select("svg").append("rect")
+    .attr("class", "outbreakNotifyShadow")
+    .attr("x", window.innerWidth / 4 + 62 + 5 - 50)
+    .attr("y", -100)
+    .attr("width", 250)
+    .attr("height", 50)
+    .attr("fill", "#838383")
+    .attr("opacity", 1), d3.select("svg").append("rect")
+    .attr("class", "outbreakNotifyBox")
+    .attr("x", window.innerWidth / 4 + 62 - 50)
+    .attr("y", -100)
+    .attr("width", 250)
+    .attr("height", 50)
+    .attr("fill", "#85bc99")
+    .attr("opacity", 1), d3.select("svg").append("text")
+    .attr("class", "outbreakNotifyText")
+    .attr("x", window.innerWidth / 4 + 62 + 5 - 50 + 12)
+    .attr("y", -100)
+    .attr("fill", "white")
+    .style("font-family", "Nunito")
+    .style("font-size", "24px")
+    .style("font-weight", 300).text("Outbreak Detected!")
+    .attr("opacity", 1), d3.select(".outbreakNotifyText").transition().duration(500)
+    .attr("y", window.innerHeight / 2 - 300 + 100 - 70 + 5),
+  d3.select(".outbreakNotifyBox").transition().duration(500)
+    .attr("y", window.innerHeight / 2 - 300),
+  d3.select(".outbreakNotifyShadow").transition().duration(500)
+    .attr("y", window.innerHeight / 2 - 300 + 7),
+  window.setTimeout(function() {
+    d3.select(".outbreakNotifyShadow").transition().duration(500).attr("y", -100),
+    d3.select(".outbreakNotifyBox").transition().duration(500).attr("y", -100),
+    d3.select(".outbreakNotifyText").transition().duration(500).attr("y", -100)
   }, 2e3)
 }
 
 function endGameSession() {
-  d3.select(".gameSVG").append("rect").attr("class", "endGameShadow").attr("x", window.innerWidth / 4 + 62 + 5 - 100).attr("y", -100).attr("width", 500).attr("height", 125).attr("fill", "#838383"), d3.select(".gameSVG").append("rect").attr("class", "endGameBox").attr("x", window.innerWidth / 4 + 62 - 100).attr("y", -100).attr("width", 500).attr("height", 125).attr("fill", "#85bc99"), d3.select(".gameSVG").append("text").attr("class", "endGameText").attr("x", window.innerWidth / 4 + 135 - 100).attr("y", -100).style("font-family", "Nunito").style("fill", "white").style("font-weight", 500).style("font-size", "25px").text("Outbreak has run its course."), d3.select(".gameSVG").append("text").attr("class", "endGameSUBMIT").attr("x", window.innerWidth / 4 + 275 - 90).attr("y", -100).style("font-family", "Nunito").style("fill", "white").style("font-weight", 500).style("font-size", "15px").style("cursor", "pointer").text("Submit").on("mouseover", function() {
-    d3.select(this).style("fill", "#2692F2")
-  }).on("mouseout", function() {
-    d3.select(this).style("fill", "white")
-  }).on("click", function() {
-    d3.select(".endGameText").transition().duration(250).attr("x", window.innerWidth / 4 + 85).text("Reticulating splines."), window.setTimeout(addPeriod1, 350), window.setTimeout(addPeriod2, 800), window.setTimeout(initScoreRecap, 1200)
-  }), d3.select(".endGameBox").transition().duration(500).attr("y", window.innerHeight / 2 - 300), d3.select(".endGameShadow").transition().duration(500).attr("y", window.innerHeight / 2 - 300 + 7), d3.select(".endGameText").transition().duration(500).attr("y", window.innerHeight / 2 - 250), d3.select(".endGameSUBMIT").transition().duration(500).attr("y", window.innerHeight / 2 - 250 + 50)
+  d3.select("svg").append("rect")
+    .attr("class", "endGameShadow")
+    .attr("x", window.innerWidth / 4 + 62 + 5 - 100)
+    .attr("y", -100)
+    .attr("width", 500)
+    .attr("height", 125)
+    .attr("fill", "#838383"), d3.select("svg").append("rect")
+    .attr("class", "endGameBox")
+    .attr("x", window.innerWidth / 4 + 62 - 100)
+    .attr("y", -100)
+    .attr("width", 500)
+    .attr("height", 125)
+    .attr("fill", "#85bc99"), d3.select("svg").append("text")
+    .attr("class", "endGameText")
+    .attr("x", window.innerWidth / 4 + 135 - 100)
+    .attr("y", -100)
+    .style("font-family", "Nunito")
+    .style("fill", "white")
+    .style("font-weight", 500)
+    .style("font-size", "25px").text("Outbreak has run its course."), d3.select("svg").append("text")
+    .attr("class", "endGameSUBMIT")
+    .attr("x", window.innerWidth / 4 + 275 - 90)
+    .attr("y", -100)
+    .style("font-family", "Nunito")
+    .style("fill", "white")
+    .style("font-weight", 500)
+    .style("font-size", "15px")
+    .style("cursor", "pointer").text("Submit").on("mouseover", function() {
+      d3.select(this).style("fill", "#2692F2")
+    }).on("mouseout", function() {
+      d3.select(this).style("fill", "white")
+    }).on("click", function() {
+      d3.select(".endGameText").transition().duration(250)
+        .attr("x", window.innerWidth / 4 + 85)
+        .text("Reticulating splines."),
+      window.setTimeout(addPeriod1, 350),
+      window.setTimeout(addPeriod2, 800),
+      window.setTimeout(initScoreRecap, 1200)
+    }),
+    d3.select(".endGameBox").transition().duration(500)
+      .attr("y", window.innerHeight / 2 - 300),
+    d3.select(".endGameShadow").transition().duration(500)
+      .attr("y", window.innerHeight / 2 - 300 + 7),
+    d3.select(".endGameText").transition().duration(500)
+      .attr("y", window.innerHeight / 2 - 250),
+    d3.select(".endGameSUBMIT").transition().duration(500)
+      .attr("y", window.innerHeight / 2 - 250 + 50)
 }
 
 function addPeriod1() {
-  d3.select(".endGameText").transition().duration(250).attr("x", window.innerWidth / 4 + 85).text("Reticulating splines..")
+  d3.select(".endGameText").transition().duration(250)
+    .attr("x", window.innerWidth / 4 + 85).text("Reticulating splines..")
 }
 
 function addPeriod2() {
-  d3.select(".endGameText").transition().duration(250).attr("x", window.innerWidth / 4 + 85).text("Reticulating splines...")
+  d3.select(".endGameText").transition().duration(250)
+    .attr("x", window.innerWidth / 4 + 85).text("Reticulating splines...")
 }
 
 function setCookies() {
@@ -832,39 +976,39 @@ function writeCookiesJSON() {
     speed ? (
       cookie.scoresRT[0].push(e),
       e > easyBar &&
-      (vaxEasyCompletion = !0),
+      (vaxEasyCompletion = true),
       vaxEasyHiScoreRT = Math.max.apply(Math, cookie.scoresRT[0])
     ) : (
       cookie.scores[0].push(e),
       e > easyBar &&
-      (vaxEasyCompletion = !0),
+      (vaxEasyCompletion = true),
       vaxEasyHiScore = Math.max.apply(Math, cookie.scores[0])
     )
   ), "medium" == difficultyString && (
     speed ? (
       cookie.scoresRT[1].push(e),
       e > mediumBar &&
-      (vaxMediumCompletion = !0),
+      (vaxMediumCompletion = true),
       vaxMediumHiScoreRT = Math.max.apply(Math, cookie.scoresRT[1])
     ) : (
       cookie.scores[1].push(e),
-      e > mediumBar && (vaxMediumCompletion = !0),
+      e > mediumBar && (vaxMediumCompletion = true),
       vaxMediumHiScore = Math.max.apply(Math, cookie.scores[1])
     )
   ), "hard" == difficultyString && (
     speed ? (
       cookie.scoresRT[2].push(e),
       e > hardBar &&
-      (vaxHardCompletion = !0),
+      (vaxHardCompletion = true),
       vaxHardHiScoreRT = Math.max.apply(Math, cookie.scoresRT[2])
     ) : (
       cookie.scores[2].push(e),
       e > hardBar &&
-      (vaxHardCompletion = !0),
+      (vaxHardCompletion = true),
       vaxHardHiScore = Math.max.apply(Math, cookie.scores[2])
     )
   ),
-  Cookies.set("json", !1),
+  Cookies.set("json", false),
   void 0 == difficultyString && (
     Cookies.set("customNodes",  customNodeChoice),
     Cookies.set("customNeighbors",  customNeighborChoice),
@@ -897,7 +1041,7 @@ function writeCookiesJSON() {
 function generateStackedBarChart() {
   var e = 125,
     t = 320,
-    i = d3.select(".gameSVG").append("svg")
+    i = d3.select("svg").append("svg")
       .attr("class", "stacked")
       .attr("width", e)
       .attr("height", t)
@@ -909,7 +1053,13 @@ function generateStackedBarChart() {
   y = d3.scale.linear().range([0, t]),
   z = d3.scale.ordinal().range(["#b7b7b7", "#85BC99", "#d9d678", "#ef5555"]);
   var a = [
-      [1, countSavedGAME(), numberVaccinated, numberQuarantined, numberOfIndividuals - numberQuarantined - numberVaccinated - countSavedGAME()]
+      [
+        1,
+        countSavedGAME(),
+        numberVaccinated,
+        numberQuarantined,
+        numberOfIndividuals - numberQuarantined - numberVaccinated - countSavedGAME()
+      ]
     ],
   o = ["uninfected", "vaccinated", "quarantined", "infected"].map(function(e, t) {
     return a.map(function(e, i) {
@@ -939,15 +1089,107 @@ function generateStackedBarChart() {
     });
   n.selectAll("rect").data(function(e) {
     return e
-  }).enter().append("svg:rect").attr("x", function(e) {
-    return x(e.x)
-  }).attr("y", function(e) {
-    return -y(e.y0) - y(e.y)
-  }).attr("height", function(e) {
-    return y(e.y)
-  }).attr("width", x.rangeBand()).attr("id", function(e) {
-    console.log(e)
-  }), d3.select(".gameSVG").append("line").style("stroke", "#707070").style("stroke-width", "1px").attr("x1", -35).attr("x2", 200).attr("y1", 470).attr("y2", 470), d3.select(".gameSVG").append("line").style("stroke", "#707070").style("stroke-width", "1px").attr("x1", -35).attr("x2", -35).attr("y1", 140).attr("y2", 470), d3.select(".gameSVG").append("text").attr("x", -83).attr("y", 162).style("font-family", "Nunito").style("font-size", "15px").style("font-weight", "500").style("fill", "#707070").text("100%"), d3.select(".gameSVG").append("text").attr("x", -76).attr("y", 310).style("font-family", "Nunito").style("font-size", "15px").style("font-weight", "500").style("fill", "#707070").text("50%"), d3.select(".gameSVG").append("text").attr("x", -72).attr("y", 455).style("font-family", "Nunito").style("font-size", "15px").style("font-weight", "500").style("fill", "#707070").text("0%"), d3.select(".gameSVG").append("rect").attr("height", 15).attr("width", 15).attr("x", 150).attr("y", 200).attr("fill", "#ef5555"), d3.select(".gameSVG").append("rect").attr("height", 15).attr("width", 15).attr("x", 150).attr("y", 230).attr("fill", "#d9d678"), d3.select(".gameSVG").append("rect").attr("height", 15).attr("width", 15).attr("x", 150).attr("y", 260).attr("fill", "#85BC99"), d3.select(".gameSVG").append("rect").attr("height", 15).attr("width", 15).attr("x", 150).attr("y", 290).attr("fill", "#b7b7b7"), d3.select(".gameSVG").append("text").style("font-family", "Nunito").style("font-size", "15px").style("fill", "#707070").attr("x", 180).attr("y", 213).text("Infected"), d3.select(".gameSVG").append("text").style("font-family", "Nunito").style("font-size", "15px").style("fill", "#707070").attr("x", 180).attr("y", 243).text("Quarantined"), d3.select(".gameSVG").append("text").style("font-family", "Nunito").style("font-size", "15px").style("fill", "#707070").attr("x", 180).attr("y", 273).text("Vaccinated"), d3.select(".gameSVG").append("text").style("font-family", "Nunito").style("font-size", "15px").style("fill", "#707070").attr("x", 180).attr("y", 303).text("Uninfected")
+  }).enter().append("svg:rect")
+    .attr("x", function(e) {
+      return x(e.x)
+    })
+    .attr("y", function(e) {
+      return -y(e.y0) - y(e.y)
+    })
+    .attr("height", function(e) {
+      return y(e.y)
+    })
+    .attr("width", x.rangeBand()),
+  d3.select("svg").append("line")
+    .style("stroke", "#707070")
+    .style("stroke-width", "1px")
+    .attr("x1", -35)
+    .attr("x2", 200)
+    .attr("y1", 470)
+    .attr("y2", 470),
+  d3.select("svg").append("line")
+    .style("stroke", "#707070")
+    .style("stroke-width", "1px")
+    .attr("x1", -35)
+    .attr("x2", -35)
+    .attr("y1", 140)
+    .attr("y2", 470),
+  d3.select("svg").append("text")
+    .attr("x", -83)
+    .attr("y", 162)
+    .style("font-family", "Nunito")
+    .style("font-size", "15px")
+    .style("font-weight", "500")
+    .style("fill", "#707070")
+    .text("100%"),
+  d3.select("svg").append("text")
+    .attr("x", -76)
+    .attr("y", 310)
+    .style("font-family", "Nunito")
+    .style("font-size", "15px")
+    .style("font-weight", "500")
+    .style("fill", "#707070")
+    .text("50%"),
+  d3.select("svg").append("text")
+    .attr("x", -72)
+    .attr("y", 455)
+    .style("font-family", "Nunito")
+    .style("font-size", "15px")
+    .style("font-weight", "500")
+    .style("fill", "#707070")
+    .text("0%"),
+  d3.select("svg").append("rect")
+    .attr("height", 15)
+    .attr("width", 15)
+    .attr("x", 150)
+    .attr("y", 200)
+    .attr("fill", "#ef5555"),
+  d3.select("svg").append("rect")
+    .attr("height", 15)
+    .attr("width", 15)
+    .attr("x", 150)
+    .attr("y", 230)
+    .attr("fill", "#d9d678"),
+  d3.select("svg").append("rect")
+    .attr("height", 15)
+    .attr("width", 15)
+    .attr("x", 150)
+    .attr("y", 260)
+    .attr("fill", "#85BC99"),
+  d3.select("svg").append("rect")
+    .attr("height", 15)
+    .attr("width", 15)
+    .attr("x", 150)
+    .attr("y", 290)
+    .attr("fill", "#b7b7b7"),
+  d3.select("svg").append("text")
+    .style("font-family", "Nunito")
+    .style("font-size", "15px")
+    .style("fill", "#707070")
+    .attr("x", 180)
+    .attr("y", 213)
+    .text("Infected"),
+  d3.select("svg").append("text")
+    .style("font-family", "Nunito")
+    .style("font-size", "15px")
+    .style("fill", "#707070")
+    .attr("x", 180)
+    .attr("y", 243)
+    .text("Quarantined"),
+  d3.select("svg").append("text")
+    .style("font-family", "Nunito")
+    .style("font-size", "15px")
+    .style("fill", "#707070")
+    .attr("x", 180)
+    .attr("y", 273)
+    .text("Vaccinated"),
+  d3.select("svg").append("text")
+    .style("font-family", "Nunito")
+    .style("font-size", "15px")
+    .style("fill", "#707070")
+    .attr("x", 180)
+    .attr("y", 303)
+    .text("Uninfected");
 }
 
 function generateUninfectedBar(e, t) {
@@ -963,21 +1205,32 @@ function generateUninfectedBar(e, t) {
     s = d3.scale.linear().domain([0, d3.max(i, function() {
       return 100
     })]).rangeRound([0, r]),
-    c = d3.select(".gameSVG").append("svg").attr("class", "barSVG").attr("width", o).attr("height", r).attr("x", 420).attr("y", 150);
-  c.selectAll("rect").data(i).enter().append("svg:rect").attr("x", function(e, t) {
-    return n(t)
-  }).attr("y", function(e) {
-    return r - s(e.score)
-  }).attr("height", function(e) {
-    return s(e.score)
-  }).attr("class", function(e, t) {
-    return 0 == t ? "current" : "best"
-  }).attr("width", a).attr("fill", function(e, t) {
-    return 0 == t ? "#b7b7b7" : "#00adea"
-  });
+    c = d3.select("svg").append("svg")
+      .attr("class", "barSVG")
+      .attr("width", o)
+      .attr("height", r)
+      .attr("x", 420)
+      .attr("y", 150);
+    c.selectAll("rect").data(i).enter().append("svg:rect")
+      .attr("x", function(e, t) {
+        return n(t)
+      })
+      .attr("y", function(e) {
+        return r - s(e.score)
+      })
+      .attr("height", function(e) {
+        return s(e.score)
+      })
+      .attr("class", function(e, t) {
+        return 0 == t ? "current" : "best"
+      })
+      .attr("width", a)
+      .attr("fill", function(e, t) {
+        return 0 == t ? "#b7b7b7" : "#00adea"
+      });
   var d = d3.select(".best"),
     l = d3.select(".current");
-  d3.select(".gameSVG").append("text")
+  d3.select("svg").append("text")
     .attr("x", d.node().getBBox().x + 426)
     .attr("y", d.node().getBBox().y + 145)
     .style("font-size", "30px")
@@ -985,7 +1238,7 @@ function generateUninfectedBar(e, t) {
     .attr("color", "#707070")
     .attr("fill", "#707070")
     .text(t + "%"),
-  d3.select(".gameSVG").append("text")
+  d3.select("svg").append("text")
     .attr("x", l.node().getBBox().x + 427)
     .attr("y", l.node().getBBox().y + 145)
     .style("font-size", "30px")
@@ -993,49 +1246,49 @@ function generateUninfectedBar(e, t) {
     .attr("color", "#707070")
     .attr("fill", "#707070")
     .text(e + "%"),
-  d3.select(".gameSVG").append("line")
+  d3.select("svg").append("line")
     .style("stroke", "#707070")
     .style("stroke-width", "1px")
     .attr("x1", 395)
     .attr("x2", 625)
     .attr("y1", 470)
     .attr("y2", 470),
-  d3.select(".gameSVG").append("line")
+  d3.select("svg").append("line")
     .style("stroke", "#707070")
     .style("stroke-width", "1px")
     .attr("x1", 395)
     .attr("x2", 395)
     .attr("y1", 140)
     .attr("y2", 470),
-  d3.select(".gameSVG").append("text")
+  d3.select("svg").append("text")
     .attr("x", 347)
     .attr("y", 162)
     .style("font-size", "15px")
     .style("font-weight", "500")
     .style("fill", "#707070")
     .text("100%"),
-  d3.select(".gameSVG").append("text")
+  d3.select("svg").append("text")
     .attr("x", 359)
     .attr("y", 310)
     .style("font-size", "15px")
     .style("font-weight", "500")
     .style("fill", "#707070")
     .text("50%"),
-  d3.select(".gameSVG").append("text")
+  d3.select("svg").append("text")
     .attr("x", 355)
     .attr("y", 455)
     .style("font-size", "15px")
     .style("font-weight", "500")
     .style("fill", "#707070")
     .text("0%"),
-  d3.select(".gameSVG").append("text")
+  d3.select("svg").append("text")
     .attr("x", 430)
     .attr("y", 489)
     .style("font-size", "15px")
     .style("font-weight", "500")
     .style("fill", "#707070")
     .text("Current"),
-  d3.select(".gameSVG").append("text")
+  d3.select("svg").append("text")
     .attr("x", 540)
     .attr("y", 489)
     .style("font-size", "15px")
@@ -1051,10 +1304,15 @@ function initScoreRecap() {
   d3.select(".endGameText").transition().duration(500).attr("y", -200),
   d3.select(".endGameSUBMIT").transition().duration(500).attr("y", -200),
   d3.select("#pinNodesDiv").remove(),
-  d3.select(".gameSVG").select("g").style("visibility", "hidden"), hideGameQuarantine();
+  d3.select("svg").select("g").style("visibility", "hidden"),
+  hideGameQuarantine();
   var e, t, i, a, o = Math.round(100 * ((countSavedGAME() + numberQuarantined + numberVaccinated) / numberOfIndividuals)).toFixed(0);
-  "easy" == difficultyString && (speed ? (a = "Easy", i = vaxEasyHiScoreRT, t = easyBar) : (a = "Easy", i = vaxEasyHiScore, t = easyBar)), "medium" == difficultyString && (speed ? (a = "Medium", i = vaxMediumHiScoreRT, t = mediumBar) : (a = "Medium", i = vaxMediumHiScore, t = mediumBar)), "hard" == difficultyString && (speed ? (a = "Hard", i = vaxHardHiScoreRT, t = hardBar) : (a = "Hard", i = vaxHardHiScore, t = hardBar)), null == difficultyString && (i = o, t = 0), e = o >= t ? !0 : !1,
-  d3.select(".gameSVG").append("text")
+  "easy" == difficultyString && (speed ? (a = "Easy", i = vaxEasyHiScoreRT, t = easyBar) : (a = "Easy", i = vaxEasyHiScore, t = easyBar)),
+  "medium" == difficultyString && (speed ? (a = "Medium", i = vaxMediumHiScoreRT, t = mediumBar) : (a = "Medium", i = vaxMediumHiScore, t = mediumBar)),
+  "hard" == difficultyString && (speed ? (a = "Hard", i = vaxHardHiScoreRT, t = hardBar) : (a = "Hard", i = vaxHardHiScore, t = hardBar)),
+  null == difficultyString && (i = o, t = 0),
+  e = o >= t ? true : false,
+  d3.select("svg").append("text")
     .attr("class", "networkSizeText")
     .attr("x", -85)
     .attr("y", 90)
@@ -1067,25 +1325,144 @@ function initScoreRecap() {
 
 function addTextRecap(e, t) {
   if (t) {
-    if (null == difficultyString) return d3.select(".gameSVG").append("text").style("font-family", "Nunito").style("font-size", "55px").style("font-weight", "500").style("fill", "#707070").attr("class", "recapBinaryText").attr("x", 732).attr("y", 180).text("Play Again!"), d3.select(".gameSVG").append("text").attr("class", "recapButton").attr("x", 450).attr("y", 625).text("Retry").style("font-size", "45px").on("click", retry).on("mouseover", function() {
-      d3.select(this).style("fill", "#2692F2")
-    }).on("mouseout", function() {
-      d3.select(this).style("fill", "#707070")
-    }), void 0;
-    d3.select(".gameSVG").append("text").style("font-family", "Nunito").style("font-size", "75px").style("font-weight", "500").style("fill", "#707070").attr("class", "recapBinaryText").attr("x", 749).attr("y", 180).text("Passed!"), d3.select(".gameSVG").append("text").attr("class", "recapText1").attr("x", 755).attr("y", 230).style("font-family", "Nunito").style("font-size", "20px").style("font-weight", "300").style("fill", "#707070").text("Well done! You exceeded the"), d3.select(".gameSVG").append("text").attr("class", "recapText2").attr("x", 755).attr("y", 255).style("font-family", "Nunito").style("font-size", "20px").style("font-weight", "300").style("fill", "#707070").text(e + "% survival rate required to"), d3.select(".gameSVG").append("text").attr("class", "recapText3").attr("x", 755).attr("y", 280).style("font-family", "Nunito").style("font-size", "20px").style("font-weight", "300").style("fill", "#707070").text("move on to the next level."), d3.select(".gameSVG").append("text").attr("class", "recapButton").attr("x", 645).attr("y", 590).style("font-size", "45px").text("Next").on("click", next).on("mouseover", function() {
-      d3.select(this).style("fill", "#2692F2")
-    }).on("mouseout", function() {
-      d3.select(this).style("fill", "#707070")
-    }), d3.select(".gameSVG").append("text").attr("class", "recapButton").style("font-size", "45px").attr("x", 240).attr("y", 590).text("Retry").on("click", retry).on("mouseover", function() {
-      d3.select(this).style("fill", "#2692F2")
-    }).on("mouseout", function() {
-      d3.select(this).style("fill", "#707070")
-    })
-  } else d3.select(".gameSVG").append("text").style("font-family", "Nunito").style("font-size", "55px").style("font-weight", "500").style("fill", "#707070").attr("class", "recapBinaryText").attr("x", 735).attr("y", 180).text("Try Again!"), d3.select(".gameSVG").append("text").attr("class", "recapText1").attr("x", 755).attr("y", 225).style("font-family", "Nunito").style("font-size", "20px").style("font-weight", "300").style("fill", "#707070").text("You did not exceed the"), d3.select(".gameSVG").append("text").attr("class", "recapText2").attr("x", 730).attr("y", 250).style("font-family", "Nunito").style("font-size", "20px").style("font-weight", "300").style("fill", "#707070").text(e + "% survival rate required to"), d3.select(".gameSVG").append("text").attr("class", "recapText3").attr("x", 742).attr("y", 273).style("font-family", "Nunito").style("font-size", "20px").style("font-weight", "300").style("fill", "#707070").text("move on to the next level."), d3.select(".gameSVG").append("text").attr("class", "recapButton").attr("x", 450).attr("y", 625).style("font-size", "45px").text("Retry").on("click", retry).on("mouseover", function() {
-    d3.select(this).style("fill", "#2692F2")
-  }).on("mouseout", function() {
-    d3.select(this).style("fill", "#707070")
-  })
+    if (null == difficultyString){
+      d3.select("svg").append("text")
+        .style("font-family", "Nunito")
+        .style("font-size", "55px")
+        .style("font-weight", "500")
+        .style("fill", "#707070")
+        .attr("class", "recapBinaryText")
+        .attr("x", 732)
+        .attr("y", 180)
+        .text("Play Again!");
+      d3.select("svg").append("text")
+        .attr("class", "recapButton")
+        .attr("x", 450)
+        .attr("y", 625)
+        .text("Retry")
+        .style("font-size", "45px")
+        .on("click", retry)
+        .on("mouseover", function() {
+          d3.select(this).style("fill", "#2692F2")
+        })
+        .on("mouseout", function() {
+          d3.select(this).style("fill", "#707070")
+        });
+      void 0;
+    } 
+    d3.select("svg").append("text")
+      .style("font-family", "Nunito")
+      .style("font-size", "75px")
+      .style("font-weight", "500")
+      .style("fill", "#707070")
+      .attr("class", "recapBinaryText")
+      .attr("x", 749)
+      .attr("y", 180)
+      .text("Passed!");
+    d3.select("svg").append("text")
+      .attr("class", "recapText1")
+      .attr("x", 755)
+      .attr("y", 230)
+      .style("font-family", "Nunito")
+      .style("font-size", "20px")
+      .style("font-weight", "300")
+      .style("fill", "#707070")
+      .text("Well done! You exceeded the");
+    d3.select("svg").append("text")
+      .attr("class", "recapText2")
+      .attr("x", 755)
+      .attr("y", 255)
+      .style("font-family", "Nunito")
+      .style("font-size", "20px")
+      .style("font-weight", "300")
+      .style("fill", "#707070")
+      .text(e + "% survival rate required to");
+    d3.select("svg").append("text")
+      .attr("class", "recapText3")
+      .attr("x", 755)
+      .attr("y", 280)
+      .style("font-family", "Nunito")
+      .style("font-size", "20px")
+      .style("font-weight", "300")
+      .style("fill", "#707070")
+      .text("move on to the next level.");
+    d3.select("svg").append("text")
+      .attr("class", "recapButton")
+      .attr("x", 645)
+      .attr("y", 590)
+      .style("font-size", "45px")
+      .text("Next")
+      .on("click", next)
+      .on("mouseover", function() {
+        d3.select(this).style("fill", "#2692F2")
+      })
+      .on("mouseout", function() {
+        d3.select(this).style("fill", "#707070")
+      });
+    d3.select("svg").append("text")
+      .attr("class", "recapButton")
+      .style("font-size", "45px")
+      .attr("x", 240)
+      .attr("y", 590)
+      .text("Retry")
+      .on("click", retry)
+      .on("mouseover", function() {
+        d3.select(this).style("fill", "#2692F2")
+      })
+      .on("mouseout", function() {
+        d3.select(this).style("fill", "#707070")
+      });
+  } else {
+    d3.select("svg").append("text")
+      .style("font-family", "Nunito")
+      .style("font-size", "55px")
+      .style("font-weight", "500")
+      .style("fill", "#707070")
+      .attr("class", "recapBinaryText")
+      .attr("x", 735)
+      .attr("y", 180)
+      .text("Try Again!");
+    d3.select("svg").append("text")
+      .attr("class", "recapText1")
+      .attr("x", 755)
+      .attr("y", 225)
+      .style("font-family", "Nunito")
+      .style("font-size", "20px")
+      .style("font-weight", "300")
+      .style("fill", "#707070")
+      .text("You did not exceed the");
+    d3.select("svg").append("text")
+      .attr("class", "recapText2")
+      .attr("x", 730)
+      .attr("y", 250)
+      .style("font-family", "Nunito")
+      .style("font-size", "20px")
+      .style("font-weight", "300")
+      .style("fill", "#707070")
+      .text(e + "% survival rate required to");
+    d3.select("svg").append("text")
+      .attr("class", "recapText3")
+      .attr("x", 742)
+      .attr("y", 273)
+      .style("font-family", "Nunito")
+      .style("font-size", "20px")
+      .style("font-weight", "300")
+      .style("fill", "#707070")
+      .text("move on to the next level.");
+    d3.select("svg").append("text")
+      .attr("class", "recapButton")
+      .attr("x", 450)
+      .attr("y", 625)
+      .style("font-size", "45px")
+      .text("Retry")
+      .on("click", retry)
+      .on("mouseover", function() {
+        d3.select(this).style("fill", "#2692F2")
+      })
+      .on("mouseout", function() {
+        d3.select(this).style("fill", "#707070")
+      });
+  }
 }
 
 function loadConclusionText() {
@@ -1096,7 +1473,7 @@ function loadConclusionText() {
   "medium" == difficultyString && (i = vaxMediumHiScore, t = mediumBar),
   "hard" == difficultyString && (i = vaxHardHiScore, t = hardBar),
   null == difficultyString && (i = e),
-  d3.select(".gameSVG").append("text")
+  d3.select("svg").append("text")
     .attr("class", "bestScore")
     .attr("x", backX + 25)
     .attr("y", 420)
@@ -1111,12 +1488,12 @@ function loadConclusionText() {
   "hard" == difficultyString && (a = "Hard"),
   null == difficultyString && (a = "Custom", i = e);
   null == difficultyString ? (
-    d3.select(".gameSVG").append("text")
+    d3.select("svg").append("text")
       .attr("class", "recapText")
       .attr("x", 260)
       .attr("y", 525)
       .text("Well done, you saved " + e + "% of the network."),
-    d3.select(".gameSVG").append("text")
+    d3.select("svg").append("text")
       .attr("class", "recapButton")
       .attr("x", 470)
       .attr("y", 590)
@@ -1129,12 +1506,12 @@ function loadConclusionText() {
         d3.select(this).style("fill", "#707070")
       })
   ) : e > t ? (
-    d3.select(".gameSVG").append("text")
+    d3.select("svg").append("text")
       .attr("class", "recapText")
       .attr("x", 260)
       .attr("y", 525)
       .text("Well done, you saved " + e + "% of the network."),
-    d3.select(".gameSVG").append("text")
+    d3.select("svg").append("text")
       .attr("class", "recapButton")
       .attr("x", 355)
       .attr("y", 590)
@@ -1146,7 +1523,7 @@ function loadConclusionText() {
       .on("mouseout", function() {
         d3.select(this).style("fill", "#707070")
       }),
-    d3.select(".gameSVG").append("text")
+    d3.select("svg").append("text")
       .attr("class", "recapButton")
       .attr("x", 580)
       .attr("y", 590)
@@ -1159,12 +1536,12 @@ function loadConclusionText() {
         d3.select(this).style("fill", "#707070")
       })
   ) : (
-    d3.select(".gameSVG").append("text")
+    d3.select("svg").append("text")
       .attr("class", "recapText")
       .attr("x", 200)
       .attr("y", 525)
       .text("Save " + t + "% of the network to unlock the next stage."),
-    d3.select(".gameSVG").append("text")
+    d3.select("svg").append("text")
       .attr("class", "recapButton")
       .attr("x", 470)
       .attr("y", 590)
@@ -1180,21 +1557,21 @@ function loadConclusionText() {
 }
 
 function retry() {
-  d3.select(".gameSVG").remove(),
+  d3.select("svg").remove(),
   graph = {},
   timestep = 0,
-  diseaseIsSpreading = !1,
-  timeToStop = !1,
+  diseaseIsSpreading = false,
+  timeToStop = false,
   null == difficultyString ? initCustomGame() : initBasicGame(difficultyString)
 }
 
 function next() {
   if (
-    d3.select(".gameSVG").remove(),
+    d3.select("svg").remove(),
     graph = {},
     timestep = 0,
-    diseaseIsSpreading = !1,
-    timeToStop = !1,
+    diseaseIsSpreading = false,
+    timeToStop = false,
     hideGameQuarantine(),
     "hard" == difficultyString || null == difficultyString
   ){
@@ -1249,14 +1626,14 @@ difficultySelection.select(".degreeToggleMenuTrue")
     d3.select(".degreeToggleMenuFalse")
       .style("color", "#BABABA")
       .style("font-weight", "300");
-    toggleDegree = !0
+    toggleDegree = true
   });
 
 difficultySelection.select(".degreeToggleMenuFalse")
   .on("click", function() {
     d3.select(".degreeToggleMenuTrue").style("color", "#BABABA").style("font-weight", "300");
     d3.select(".degreeToggleMenuFalse").style("color", "#2692F2").style("font-weight", "500");
-    toggleDegree = !1
+    toggleDegree = false
   });
 
 difficultySelection.select(".turnBasedTrue")
@@ -1267,7 +1644,7 @@ difficultySelection.select(".turnBasedTrue")
     d3.select(".realTimeTrue")
       .style("color", "#BABABA")
       .style("font-weight", "300");
-    speed = !1;
+    speed = false;
     vaxEasyHiScore == -1 / 0 || d3.select("#score-easy").text("(Best: " + vaxEasyHiScore + "%)");
     vaxMediumHiScore == -1 / 0 || d3.select("#score-medium").text("(Best: " + vaxMediumHiScore + "%)");
     vaxHardHiScore == -1 / 0 || d3.select("#score-hard").text("(Best: " + vaxHardHiScore + "%)");
@@ -1279,22 +1656,22 @@ difficultySelection.select(".realTimeTrue")
       .style("color", "#BABABA")
       .style("font-weight", "300");
     d3.select(".realTimeTrue")
-    .style("color", "#2692F2")
-    .style("font-weight", "500");
-    speed = !0;
-    0 > vaxEasyHiScoreRT ? d3.select("#score-easy").text("") : d3.select("#score-easy").text("(Best: " + vaxEasyHiScoreRT + "%)");
-    0 > vaxMediumHiScoreRT ? d3.select("#score-medium").text("") : d3.select("#score-medium").text("(Best: " + vaxMediumHiScoreRT + "%)");
-    0 > vaxHardHiScoreRT ? d3.select("#score-hard").text("") : d3.select("#score-hard").text("(Best: " + vaxHardHiScoreRT + "%)")
+      .style("color", "#2692F2")
+      .style("font-weight", "500");
+    speed = true;
+    d3.select("#score-easy").text(0 > vaxEasyHiScoreRT ? "" : "(Best: " + vaxEasyHiScoreRT + "%)");
+    d3.select("#score-medium").text(0 > vaxMediumHiScoreRT ? "" : "(Best: " + vaxMediumHiScoreRT + "%)");
+    d3.select("#score-hard").text(0 > vaxHardHiScoreRT ? "" : "(Best: " + vaxHardHiScoreRT + "%)");
   });
 
 window.setTimeout(readCookiesJSON, 500),
 jQuery(document).bind("keydown", function(e) {
   void 0 != currentNode && (
     e.shiftKey && 32 == e.which ? (
-      currentNode.fixed = !1,
+      currentNode.fixed = false,
       currentElement.style("stroke-width", "2px")
     ) : 32 == e.which && (
-      currentNode.fixed = !0,
+      currentNode.fixed = true,
       currentElement.style("stroke-width", "3px")
     )
   )
