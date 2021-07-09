@@ -202,6 +202,46 @@ var hiSVG,
     function detectVizSimCompletion() {
       0 == getStatuses("I") && timestep > 0 && (timeToStop = true, diseaseIsSpreading = false)
     }
+
+    function getStatuses(t) {
+      for (var e = 0, n = 0, r = 0, i = 0, o = 0; o < graph.nodes.length; o++) {
+        var a = graph.nodes[o];
+        "S" == a.status && e++,
+        "I" == a.status && n++,
+        "R" == a.status && r++,
+        "V" == a.status && i++;
+      }
+      return "S" == t ? e : "I" == t ? n : "R" == t ? r : "V" == t ? i : void 0
+    }
+
+    function infection_noGuaranteedTransmission() {
+      for (var t = 0, e = 0; e < graph.nodes.length; e++)
+        if ("S" == graph.nodes[e].status) {
+          for (var n = graph.nodes[e], r = findNeighbors(n), i = [], o = 0, a = 0; a < r.length; a++) {
+            var u = r[a];
+            "I" == u.status && (i.push(r[a]), o++)
+          }
+          var s = 1 - Math.pow(1 - transmissionRate, o);
+          if (Math.random() < s) {
+            t++;
+            var l = shuffle(i), c = l[0];
+            exposeIndividual(n, c)
+          }
+        }
+    }
+    
+    function selectIndexCase() {
+      var t = graph.nodes.length, e = 0;
+      do {
+        var n = Math.floor(Math.random() * t),
+            r = graph.nodes[n];
+        e++
+      } while ("V" == r.status && 500 > e);
+      500 == e && (r.status = "S"),
+        this.indexCase = null,
+        this.indexCase = r,
+        infectIndividual(this.indexCase)
+    }
     
     function findMaxConnectedByType(e, t) {
       susceptibleNeighbors = [];

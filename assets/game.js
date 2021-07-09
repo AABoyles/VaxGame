@@ -5,7 +5,6 @@ var numberOfIndividuals,
   force,
   node,
   link,
-  scenarioTitle,
   resizingParameter = 2,
   invisibleParameter = 1.9,
   transmissionRate,
@@ -73,7 +72,7 @@ var numberOfIndividuals,
   currentNode,
   currentElement,
   cookie = {},
-  pop,
+  pop = document.getElementById("audio"),
   best,
   current,
   originalLocation = [0, 0],
@@ -273,7 +272,6 @@ function initBasicGame(e) {
 d3.select("#custom-launch").on('click', initCustomGame);
 
 function initCustomGame() {
-  scenarioTitle = "custom",
   difficultyString = null,
   d3.select(".newGameHeader").remove(),
   graph = {},
@@ -309,7 +307,6 @@ function initCustomGame() {
 }
 
 function initGameSpace() {
-  pop = document.getElementById("audio"),
   game = true,
   loadGameSyringe(),
   vaccinateMode = false,
@@ -455,42 +452,8 @@ function initGameSpace() {
       }
 }
 
-function loadHotKeyText() {
-  var e = true;
-  d3.select("body").append("div")
-    .attr("id", "pinNodesDiv"),
-  d3.select("#pinNodesDiv").append("text")
-    .attr("id", "pinHeader")
-    .style("color", "#2692F2")
-    .text("▴ Pin Nodes ▴")
-    .style("cursor", "pointer"),
-  d3.select("#pinNodesDiv").append("text")
-    .attr("id", "pinText")
-    .html("Hover and hit <b>spacebar</b> to pin."),
-  d3.select("#pinNodesDiv").append("text")
-    .attr("id", "unPinText")
-    .html("Hover and hit <b>shift+spacebar</b> </br> to unpin."),
-  d3.select("#pinNodesDiv").on("click", function() {
-    e ? (
-      d3.select("#pinText").remove(), 
-      d3.select("#unPinText").remove()
-    ) : (
-      d3.select("#pinNodesDiv").append("text")
-        .attr("id", "pinText")
-        .html("Hover and hit <b>spacebar</b> to pin."),
-      d3.select("#pinNodesDiv").append("text")
-        .attr("id", "unPinText")
-        .html("Hover and hit <b>shift+spacebar</b> </br> to unpin.")
-      ),
-      e = !e,
-      e ? d3.select("#pinHeader").text("▴ Pin Nodes ▴") : d3.select("#pinHeader").text("▾ Pin Nodes ▾")
-    }
-  )
-}
-
 function nodeSize(e) {
-  var t;
-  return t = toggleDegree ? (findNeighbors(e).length + 1.5) * resizingParameter : 8
+  return toggleDegree ? (findNeighbors(e).length + 1.5) * resizingParameter : 8
 }
 
 function nodeColor(e) {
@@ -540,23 +503,17 @@ function speedModeGameClick(e) {
 }
 
 function tick() {
-  clickArea.attr("cx", function(e) {
-    return e.x = Math.max(8, Math.min(width - 8, e.x))
-  }).attr("cy", function(e) {
-    return e.y = Math.max(8, Math.min(.85 * height, e.y))
-  }), node.attr("cx", function(e) {
-    return e.x = Math.max(8, Math.min(width - 8, e.x))
-  }).attr("cy", function(e) {
-    return e.y = Math.max(8, Math.min(.85 * height, e.y))
-  }), link.attr("x1", function(e) {
-    return e.source.x
-  }).attr("y1", function(e) {
-    return e.source.y
-  }).attr("x2", function(e) {
-    return e.target.x
-  }).attr("y2", function(e) {
-    return e.target.y
-  })
+  clickArea
+    .attr("cx", e => e.x = Math.max(8, Math.min(width - 8, e.x)))
+    .attr("cy", e => e.y = Math.max(8, Math.min(.85 * height, e.y))),
+  node
+    .attr("cx", e => e.x = Math.max(8, Math.min(width - 8, e.x)))
+    .attr("cy", e => e.y = Math.max(8, Math.min(.85 * height, e.y))),
+  link
+    .attr("x1", e => e.source.x)
+    .attr("y1", e => e.source.y)
+    .attr("x2", e => e.target.x)
+    .attr("y2", e => e.target.y)
 }
 
 function countSavedGAME() {
