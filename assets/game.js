@@ -1,16 +1,12 @@
 var numberOfIndividuals,
   meanDegree,
-  rewire = .1,
   graph = {},
   force,
   node,
   link,
-  resizingParameter = 2,
   invisibleParameter = 1.9,
   transmissionRate,
   recoveryRate,
-  transmissionRates = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1],
-  recoveryRates = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1],
   independentOutbreaks = 1,
   numberVaccinated,
   numberQuarantined,
@@ -87,14 +83,15 @@ var numberOfIndividuals,
   customNodeChoice = 1,
   customVaccineChoice = 1,
   customNeighborChocie = 1,
-  customOutbreakChoice = 1;
-var speed = false,
+  customOutbreakChoice = 1,
+  speed = false,
   toggleDegree = true;
 
 function initCookiesJSON() {
   var e = Cookies.get("vaxEasyCompletion");
   e || isNaN(customNodeChoice) ? clearCookies() : (
-    !e || isNaN(customNodeChoice)) && clearCookies(),
+    !e || isNaN(customNodeChoice)
+  ) && clearCookies(),
   Cookies.set("customNodes",  75);
   Cookies.set("customNeighbors",  3);
   Cookies.set("customVaccines",  10);
@@ -119,7 +116,7 @@ function initCookiesJSON() {
   Cookies.set("vaxCookie", s, {
     expires: 365,
     path: "/"
-  })
+  });
 }
 
 function readCookiesJSON() {
@@ -236,27 +233,27 @@ function initBasicGame(e) {
     meanDegree = 3,
     numberOfVaccines = 5,
     independentOutbreaks = 1,
-    transmissionRate = transmissionRates[7],
-    recoveryRate = recoveryRates[0]
+    transmissionRate = 0.7,
+    recoveryRate = 0
   ),
   "medium" == e && (
     numberOfIndividuals = 75,
     meanDegree = 4,
     numberOfVaccines = 7,
     independentOutbreaks = 2,
-    transmissionRate = transmissionRates[7],
-    recoveryRate = recoveryRates[0]
+    transmissionRate = 0.7,
+    recoveryRate = 0
   ),
   "hard" == e && (
     charge = -300,
     numberOfIndividuals = 100,
     meanDegree = 4,
     numberOfVaccines = 15,
-    transmissionRate = transmissionRates[4],
-    recoveryRate = recoveryRates[0],
+    transmissionRate = 0.4,
+    recoveryRate = 0,
     independentOutbreaks = 3
   ),
-  graph = generateSmallWorld(numberOfIndividuals, rewire, meanDegree);
+  graph = generateSmallWorld(numberOfIndividuals, 0.1, meanDegree);
   for (var t = 0; t < graph.nodes.length; t++){
     graph.nodes[t].fixed = false;
   }
@@ -288,7 +285,7 @@ function initCustomGame() {
   numberOfIndividuals - numberOfVaccines > independentOutbreaks && (independentOutbreaks = 1),
   customNodeChoice > 100 && (charge = -150),
   customNodeChoice > 125 && (charge = -130),
-  graph = generateSmallWorld(numberOfIndividuals, rewire, meanDegree),
+  graph = generateSmallWorld(numberOfIndividuals, 0.1, meanDegree),
   removeDuplicateEdges(graph);
   for (var e = 0; e < graph.nodes.length; e++) graph.nodes[e].refuser = false;
   for (var e = 0; numberOfRefusers > e; e++) {
@@ -324,136 +321,103 @@ function initGameSpace() {
       .attr("class", "gameSVG")
       .attr("pointer-events", "all")
       .append("svg:g"),
-    force = d3.layout.force()
-      .nodes(graph.nodes)
-      .links(graph.links)
-      .size([width, height])
-      .charge(charge)
-      .friction(friction)
-      .on("tick", tick)
-      .start(),
-    link = gameSVG.selectAll(".link")
-      .data(graph.links)
-      .enter()
-      .append("line")
-      .attr("class", "link"),
-    clickArea = gameSVG.selectAll(".node")
-      .data(graph.nodes)
-      .enter()
-      .append("circle")
-      .attr("class", "clickArea")
-      .attr("r", function(e) {
-        var t;
-        return
-          "easy" == difficultyString && (t = invisibleParameter * nodeSize(e)),
-          "medium" == difficultyString && (t = (invisibleParameter - .2) * nodeSize(e)),
-          "hard" == difficultyString && (t = (invisibleParameter - .3) * nodeSize(e)),
-          t
-      })
-      .attr("fill", "black")
-      .attr("opacity", 0)
-      .on("click", function(e) {
-        speed ? speedModeGameClick(e) : gameClick(e)
-      })
-      .call(d3.behavior.drag().on("dragstart", function(e) {
-        dragStartDateObject = {},
-        dragStartMillis = 0,
-        dragEndMillis = 0,
-        clickTime = 1e4,
-        dragStartDateObject = new Date,
-        dragStartMillis = dragStartDateObject.getMilliseconds(),
-        originalLocation = [],
-        newLocation = [],
-        originalLocation[0] = e.x, 
-        originalLocation[1] = e.y,
-        e.fixed = true
-      }).on("drag", function(e) {
-        e.px += d3.event.dx,
-        e.py += d3.event.dy,
-        e.x += d3.event.dx,
-        e.y += d3.event.dy,
-        tick(), 
-        newLocation[0] = e.x,
-        newLocation[1] = e.y
-      }).on("dragend", function(e) {
-        dragEndDateObject = new Date,
-        dragEndMillis = dragEndDateObject.getMilliseconds(),
-        clickTime = Math.abs(dragEndMillis - dragStartMillis),
-        e.fixed = false,
-        tick(),
-        force.resume(),
-        getCartesianDistance(originalLocation, newLocation) < dragDistanceThreshold ? clickTimeThreshold > clickTime && (
-          speed ? speedModeGameClick(e) : gameClick(e)
-        ) : clickTimeThreshold > clickTime && (
-          speed ? speedModeGameClick(e) : gameClick(e)
-        )
-      })),
-      node = gameSVG.selectAll(".node")
-        .data(graph.nodes)
-        .enter()
-        .append("circle")
-        .attr("class", "node")
-        .attr("r", nodeSize)
-        .attr("fill", nodeColor)
-        .on("click", function(e) {
-          speed ? speedModeGameClick(e) : gameClick(e)
-        })
-        .on("mouseover", function(e) {
-          d3.select(this).style("stroke-width", "3px"),
-          currentNode = e,
-          currentElement = d3.select(this)
-        })
-        .on("mouseout", function() {
-          d3.select(this).style("stroke-width", "2px"),
-          1 == currentNode.fixed && d3.select(this).style("stroke-width", "3px"),
-          currentNode = null,
-          currentElement = null
-        })
-        .call(d3.behavior.drag()
-          .on("dragstart", function(e) {
-            dragStartDateObject = {},
-            dragStartMillis = 0,
-            dragEndMillis = 0,
-            clickTime = 1e4,
-            dragStartDateObject = new Date,
-            dragStartMillis = dragStartDateObject.getMilliseconds(),
-            originalLocation = [],
-            newLocation = [],
-            originalLocation[0] = e.x,
-            originalLocation[1] = e.y,
-            e.fixed = true
-          })
-          .on("drag", function(e) {
-            e.px += d3.event.dx,
-            e.py += d3.event.dy,
-            e.x += d3.event.dx,
-            e.y += d3.event.dy,
-            tick(),
-            newLocation[0] = e.x,
-            newLocation[1] = e.y
-          })
-          .on("dragend", function(e) {
-            dragEndDateObject = new Date,
-            dragEndMillis = dragEndDateObject.getMilliseconds(),
-            clickTime = Math.abs(dragEndMillis - dragStartMillis),
-            e.fixed = false,
-            tick(),
-            force.resume(),
-            getCartesianDistance(originalLocation, newLocation) < dragDistanceThreshold ? clickTimeThreshold > clickTime && (speed ? speedModeGameClick(e) : gameClick(e)) : clickTimeThreshold > clickTime && (speed ? speedModeGameClick(e) : gameClick(e))
-          })
-        );
-      if(difficultyString == "hard" || difficultyString == null){
-        refusersPresent();
-      }
-      if(toggleDegree){
-        charge = (difficultyString == "easy"  ) ? -850 : charge;
-        charge = (difficultyString == "medium") ? -450 : charge;
-        charge = (difficultyString == "hard"  ) ? -300 : charge;
-      }
+  link = gameSVG.selectAll(".link")
+    .data(graph.links)
+    .enter()
+    .append("line")
+    .attr("class", "link"),
+  drag = d3.drag()
+    .on("start", function(e, d) {
+      dragStartDateObject = {},
+      dragStartMillis = 0,
+      dragEndMillis = 0,
+      clickTime = 1e4,
+      dragStartDateObject = new Date,
+      dragStartMillis = dragStartDateObject.getMilliseconds(),
+      originalLocation = [],
+      newLocation = [],
+      originalLocation[0] = e.x,
+      originalLocation[1] = e.y,
+      d.fixed = true
+    })
+    .on("drag", function(e, d) {
+      d.px += e.dx,
+      d.py += e.dy,
+      d.x += e.dx,
+      d.y += e.dy,
+      tick(),
+      newLocation[0] = d.x,
+      newLocation[1] = d.y
+    })
+    .on("end", function(e, d) {
+      dragEndDateObject = new Date,
+      dragEndMillis = dragEndDateObject.getMilliseconds(),
+      clickTime = Math.abs(dragEndMillis - dragStartMillis),
+      d.fixed = false,
+      tick(),
+      force.alpha(0.3).restart(),
+      getCartesianDistance(originalLocation, newLocation) < dragDistanceThreshold ?
+        clickTimeThreshold > clickTime && (speed ? speedModeGameClick(e) : gameClick(e)) :
+        clickTimeThreshold > clickTime && (speed ? speedModeGameClick(e) : gameClick(e))
+    });
+  clickArea = gameSVG.selectAll(".node")
+    .data(graph.nodes)
+    .enter()
+    .append("circle")
+    .attr("class", "clickArea")
+    .attr("r", function(e) {
+      var t;
+      return
+        "easy" == difficultyString && (t = invisibleParameter * nodeSize(e)),
+        "medium" == difficultyString && (t = (invisibleParameter - .2) * nodeSize(e)),
+        "hard" == difficultyString && (t = (invisibleParameter - .3) * nodeSize(e)),
+        t
+    })
+    .attr("fill", "black")
+    .attr("opacity", 0)
+    .on("click", function(e) {
+      speed ? speedModeGameClick(e) : gameClick(e)
+    })
+    .call(drag),
+  node = gameSVG.selectAll(".node")
+    .data(graph.nodes)
+    .enter()
+    .append("circle")
+    .attr("class", "node")
+    .attr("r", nodeSize)
+    .attr("fill", nodeColor)
+    .on("click", function(e) {
+      speed ? speedModeGameClick(e) : gameClick(e)
+    })
+    .on("mouseover", function(e) {
+      d3.select(this).style("stroke-width", "3px"),
+      currentNode = e,
+      currentElement = d3.select(this)
+    })
+    .on("mouseout", function() {
+      d3.select(this).style("stroke-width", "2px"),
+      1 == currentNode.fixed && d3.select(this).style("stroke-width", "3px"),
+      currentNode = null,
+      currentElement = null
+    })
+    .call(drag);
+  force = d3.forceSimulation(graph.nodes)
+    .force("charge", d3.forceManyBody().strength(-charge))
+    .force("link", d3.forceLink(graph.links))
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .on("tick", tick);
+  if(difficultyString == "hard" || difficultyString == null){
+    refusersPresent();
+  }
+  if(toggleDegree){
+    charge = (difficultyString == "easy"  ) ? -850 : charge;
+    charge = (difficultyString == "medium") ? -450 : charge;
+    charge = (difficultyString == "hard"  ) ? -300 : charge;
+  }
 }
 
 function nodeSize(e) {
-  return toggleDegree ? (findNeighbors(e).length + 1.5) * resizingParameter : 8
+  return toggleDegree ? (findNeighbors(e).length + 1.5) * 2 : 8
 }
 
 function nodeColor(e) {
@@ -503,12 +467,9 @@ function speedModeGameClick(e) {
 }
 
 function tick() {
-  clickArea
-    .attr("cx", e => e.x = Math.max(8, Math.min(width - 8, e.x)))
-    .attr("cy", e => e.y = Math.max(8, Math.min(.85 * height, e.y))),
   node
-    .attr("cx", e => e.x = Math.max(8, Math.min(width - 8, e.x)))
-    .attr("cy", e => e.y = Math.max(8, Math.min(.85 * height, e.y))),
+    .attr("cx", e => e.x)
+    .attr("cy", e => e.y);
   link
     .attr("x1", e => e.source.x)
     .attr("y1", e => e.source.y)
@@ -529,7 +490,9 @@ function gameUpdate() {
       t = removeOldLinks(graph);
   graph.links = t,
   updateCommunities(),
-  force.nodes(e).charge(charge).friction(friction).links(t).start(),
+  force.nodes(e)
+    .force("charge", d3.forceManyBody().strength(-charge))
+    .force("links", d3.forceLink(graph.links)),
   link = gameSVG.selectAll("line.link").data(t, function(e) {
     return e.source.id + "-" + e.target.id
   }),
@@ -566,7 +529,7 @@ function gameUpdate() {
     .attr("cy", e => e.y)
     .style("fill", nodeColor)
     .on("click", e => speed ? speedModeGameClick(e) : gameClick(e))
-    .call(force.drag);
+    .call(drag);
   node.exit().remove();
 }
 
@@ -624,7 +587,7 @@ function popNewGameInfection() {
   d3.selectAll(".node").transition().duration(500)
     .attr("r", function(e) {
       var t;
-      return t = toggleDegree ? (findNeighbors(e).length + 1.5) * resizingParameter : 8,
+      return t = toggleDegree ? (findNeighbors(e).length + 1.5) * 2 : 8,
         "I" == e.status ? 1 == timestep - e.exposureTimestep ? 1.5 * t : t : t
     });
 }
@@ -1621,15 +1584,4 @@ difficultySelection.select(".realTimeTrue")
     d3.select("#score-hard").text(0 > vaxHardHiScoreRT ? "" : "(Best: " + vaxHardHiScoreRT + "%)");
   });
 
-window.setTimeout(readCookiesJSON, 500),
-jQuery(document).bind("keydown", function(e) {
-  void 0 != currentNode && (
-    e.shiftKey && 32 == e.which ? (
-      currentNode.fixed = false,
-      currentElement.style("stroke-width", "2px")
-    ) : 32 == e.which && (
-      currentNode.fixed = true,
-      currentElement.style("stroke-width", "3px")
-    )
-  )
-});
+window.setTimeout(readCookiesJSON, 500);
